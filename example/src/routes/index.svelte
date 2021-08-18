@@ -1,3 +1,7 @@
+<script>
+  console.log('check hello world')
+</script>
+
 <style>
     .hello{
         color: red;

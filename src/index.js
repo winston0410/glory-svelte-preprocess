@@ -16,14 +16,12 @@ export default function () {
         transformer.generateToken(ast.css);
 
         return {
-          code: buildHtml(classCache, ast.html),
+          code: `<style>${buildCss(declarationCache)}</style>${buildHtml(
+            classCache,
+            ast.html
+          )}`,
         };
       }
-    },
-    style: function () {
-      return {
-        code: buildCss(declarationCache),
-      };
     },
   };
 }
