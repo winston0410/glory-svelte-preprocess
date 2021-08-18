@@ -1,0 +1,27 @@
+{
+  "name": "glory-svelte-preprocess",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "A svelte preprocess to minimize and reuse CSS classname for maximum performance",
+  "main": "./src/index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/winston0410/glory-svelte-preprocess.git"
+  },
+  "author": "Hugo Sum",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/winston0410/glory-svelte-preprocess/issues"
+  },
+  "homepage": "https://github.com/winston0410/glory-svelte-preprocess#readme",
+  "dependencies": {
+    "@blackblock/joli-string": "^1.1.0",
+    "svelte": "^3.42.1"
+  }
+}
