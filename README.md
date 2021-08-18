@@ -1,6 +1,6 @@
 # glory-svelte-preprocess
 
-This plugin minimize your CSS classname in a revolutionary way that maximize your performance
+This plugin minimize your CSS classname in a revolutionary way for maximum performance.
 
 ## tldr;
 
@@ -47,6 +47,35 @@ This preprocess will turn this into the following output:
 <h2 class="a c">
     <p>does magic!</p>
 </h2>
+```
+
+## Installation
+
+```sh
+npm install glory-svelte-preprocess
+```
+
+## Usage
+
+Just import this preprocessor in your `svelte.config.js`
+
+```javascript
+import gloryPreprocess from "glory-svelte-preprocess"
+import preprocess from 'svelte-preprocess';
+
+const config = {
+	preprocess: [
+        gloryPreprocess(),
+		preprocess()
+	],
+
+	kit: {
+		target: '#svelte',
+		adapter: adapter()
+	}
+};
+
+export default config;
 ```
 
 ## Related project
