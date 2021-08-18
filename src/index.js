@@ -1,10 +1,11 @@
 import { parse } from "svelte/compiler";
+import createTokenizer from "./tokenizer.js";
 import createTransformer from "./transformer.js";
-import { buildCss, buildHtml } from "./builder.js";
+
 //  Keep state outside default function as it will be called multiple times
 const classCache = {};
 const declarationCache = {};
-const transformer = createTransformer(classCache, declarationCache);
+const tokernizer = createTokenizer(classCache, declarationCache);
 
 export default function () {
   return {
@@ -13,13 +14,17 @@ export default function () {
       if (!filename.includes(".svelte-kit")) {
         const ast = parse(content, { filename });
 
-        transformer.generateToken(ast.css);
+        tokernizer.generateToken(ast.css);
+
+        const transformer = createTransformer(content);
+
+        const result = transformer
+          .transformHtml(ast.html, classCache)
+          .transformCss(ast.css, declarationCache)
+          .toString();
 
         return {
-          code: `<style>${buildCss(declarationCache)}</style>${buildHtml(
-            classCache,
-            ast.html
-          )}`,
+          code: result,
         };
       }
     },

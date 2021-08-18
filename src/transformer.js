@@ -1,134 +1,67 @@
-import joli from "@blackblock/joli-string";
+import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
+import { getMediaQuery, getClassName, getDeclaration, assembleRules } from "./helper.js";
 
-const getClassName = (rule) => {
-  let className = "";
-  for (const selectorNode of rule.prelude.children[0].children) {
-    if (selectorNode.type === "IdSelector") {
-      return false;
-    } else {
-      className += selectorNode.name;
-    }
-  }
-  return className;
-};
-
-const tokenizeRules = (
-  rule,
-  declarationCache,
-  next,
-  relatedAtRule = "none"
-) => {
-  let generatedClassList = {};
-  for (const declarationNode of rule.block.children) {
-    let declaration = "";
-    declaration += declarationNode.property;
-    for (const valueNode of declarationNode.value.children) {
-      if (valueNode.value) {
-        declaration += `:${valueNode.value}${valueNode.unit};`;
-      } else {
-        declaration += `:${valueNode.name};`;
-      }
-    }
-
-    if (!declarationCache[relatedAtRule]) {
-      declarationCache[relatedAtRule] = {};
-    }
-
-    const targetCache = declarationCache[relatedAtRule];
-
-    if (!targetCache[declaration]) {
-      const token = next();
-      targetCache[declaration] = token;
-      generatedClassList[token] = true;
-    }
-  }
-  return generatedClassList;
-};
-
-const getMediaQuery = (rule) => {
-  let name = "@" + rule.name;
-  for (const child of rule.prelude.children[0].children[0].children) {
-    switch (child.type) {
-      case "Identifier":
-        name += child.name;
-        break;
-
-      case "WhiteSpace":
-        name += child.value;
-        break;
-
-      case "MediaFeature":
-        name += `(${child.name}:${child.value.value}${child.value.unit})`;
-        break;
-
-      default:
-        break;
-    }
-  }
-  return name;
-};
-
-const hydrateClassCache = (
-  rule,
-  classCache,
-  declarationCache,
-  next,
-  mediaQueryName
-) => {
-  const className = getClassName(rule);
-  classCache[className] = Object.assign(
-    classCache[className] ?? {},
-    tokenizeRules(rule, declarationCache, next, mediaQueryName)
-  );
-};
-
-const createTransformer = (classCache, declarationCache) => {
-  const next = joli("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
+export default function (code) {
+  const changeable = new MagicString(code);
 
   return {
-    generateToken(cssAst) {
-      walk(cssAst, {
-        enter(node, parent, prop, index) {
+    transformCss(ast, cache) {
+      walk(ast, {
+        enter(node) {
           switch (node.type) {
             case "Style": {
-              for (const rule of node.children) {
-                if (rule.type === "Rule") {
-                  hydrateClassCache(rule, classCache, declarationCache, next);
-                }
+              for (const child of node.children) {
+                  if (child.type === "Rule") {
+                      changeable.overwrite(child.start, child.end, "")
+                  }
               }
+              changeable.appendRight(node.children[0].start, assembleRules(cache))
               return;
             }
 
             case "Atrule": {
-              //  TODO: patch those removed styling back in, @keyframes() and @font-face
               if (node.name !== "media") {
                 return;
               }
-
-              const mediaQueryName = getMediaQuery(node);
-
-              for (const rule of node.block.children) {
-                hydrateClassCache(
-                  rule,
-                  classCache,
-                  declarationCache,
-                  next,
-                  mediaQueryName
-                );
-              }
-              //  console.log(classCache);
-              return;
+              return changeable.overwrite(node.start, node.end, "")
             }
 
             default: {
-              return this.skip();
+              return;
             }
           }
         },
       });
+      return this;
+    },
+    transformHtml(ast, cache) {
+      walk(ast, {
+        enter(node) {
+          if (node.type !== "Attribute") {
+            return;
+          }
+          if (node.name !== "class") {
+            return;
+          }
+
+          const attrValue = node.value[0];
+
+          for (const value of attrValue.raw.split(" ")) {
+            let minifiedClass = "";
+            let index = 0;
+            for (const token in cache[value]) {
+              minifiedClass += index === 0 ? token : " " + token;
+              index++;
+            }
+            changeable.overwrite(attrValue.start, attrValue.end, minifiedClass);
+          }
+        },
+      });
+      return this;
+    },
+    toString() {
+      return changeable.toString();
     },
   };
-};
-
-export default createTransformer;
+}
