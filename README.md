@@ -48,3 +48,9 @@ This preprocess will turn this into the following output:
     <p>does magic!</p>
 </h2>
 ```
+
+## Related project
+
+[glory](https://github.com/winston0410/glory)
+
+The world fastest framework agonistic CSS-in-JS library.
