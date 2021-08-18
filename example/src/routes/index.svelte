@@ -4,6 +4,12 @@
         font-size: 12px;
     }
 
+    @media (min-width: 30em) and (max-width: 80em)  {
+        .hello{
+           font-size: 100px;
+        }
+    }
+
     .world{
         color: red;
         font-size: 16px;

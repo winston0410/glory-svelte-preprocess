@@ -1,8 +1,14 @@
 export const buildCss = (cache) => {
   let code = "";
 
-  for (const property in cache) {
-    code += `.${cache[property]}{${property}}`;
+  for (const mediaQuery in cache) {
+    for (const property in cache[mediaQuery]) {
+      let rule = `.${cache[mediaQuery][property]}{${property}}`;
+      if (mediaQuery !== "none") {
+          rule = `${mediaQuery}{${rule}}`
+      }
+      code += rule;
+    }
   }
 
   return code;
@@ -11,14 +17,16 @@ export const buildCss = (cache) => {
 const assembleAttributes = (nodeList, cache) => {
   let code = "";
 
+  console.log('check cache', cache)
+
   for (const node of nodeList) {
-    let value = node.value[0].raw
+    let value = node.value[0].raw;
     if (node.name === "class") {
       let classNames = "";
       for (const value of node.value[0].raw.split(" ")) {
         classNames += ` ${cache[value] ?? ""}`;
       }
-      value = classNames
+      value = classNames;
     }
     code += ` ${node.name}="${value}"`;
   }

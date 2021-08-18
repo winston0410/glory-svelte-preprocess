@@ -13,8 +13,12 @@ const getClassName = (rule) => {
   return className;
 };
 
-const hydrateCache = (rule, classCache, declarationCache, next) => {
-  const className = getClassName(rule);
+const tokenizeRules = (
+  rule,
+  declarationCache,
+  next,
+  relatedAtRule = "none"
+) => {
   let minifiedClassName = "";
   for (const declarationNode of rule.block.children) {
     let declaration = "";
@@ -27,15 +31,45 @@ const hydrateCache = (rule, classCache, declarationCache, next) => {
       }
     }
 
-    let nameHash = declarationCache[declaration];
+    if (!declarationCache[relatedAtRule]) {
+      declarationCache[relatedAtRule] = {};
+    }
+
+    const targetCache = declarationCache[relatedAtRule];
+
+    //  TODO: move this mutation away
+    let nameHash = targetCache[declaration];
 
     if (!nameHash) {
-      nameHash = declarationCache[declaration] = next();
+      nameHash = targetCache[declaration] = next();
     }
 
     minifiedClassName += ` ${nameHash}`;
   }
-  classCache[className] = minifiedClassName;
+  return minifiedClassName;
+};
+
+const getMediaQuery = (rule) => {
+  let name = "@" + rule.name;
+  for (const child of rule.prelude.children[0].children[0].children) {
+    switch (child.type) {
+      case "Identifier":
+        name += child.name;
+        break;
+
+      case "WhiteSpace":
+        name += child.value;
+        break;
+
+      case "MediaFeature":
+        name += `(${child.name}:${child.value.value}${child.value.unit})`;
+        break;
+
+      default:
+        break;
+    }
+  }
+  return name;
 };
 
 const createTransformer = (classCache, declarationCache) => {
@@ -45,11 +79,44 @@ const createTransformer = (classCache, declarationCache) => {
     generateToken(cssAst) {
       walk(cssAst, {
         enter(node, parent, prop, index) {
-          if (node.type !== "Rule") {
-            return;
-          }
+          switch (node.type) {
+            case "Style": {
+              for (const rule of node.children) {
+                if (rule.type === "Rule") {
+                  const className = getClassName(rule);
+                  if (!classCache[className]) {
+                      classCache[className] = ""
+                  }
+                  classCache[className] = tokenizeRules(
+                    rule,
+                    declarationCache,
+                    next
+                  );
+                }
+              }
+              return;
+            }
 
-          hydrateCache(node, classCache, declarationCache, next);
+            case "Atrule": {
+              //  TODO: exclude rules except mediaQuery
+              //  console.log('check atrule', node)
+              const mediaQueryName = getMediaQuery(node);
+              for (const rule of node.block.children) {
+                const className = getClassName(rule);
+                classCache[className] = tokenizeRules(
+                  rule,
+                  declarationCache,
+                  next,
+                  mediaQueryName
+                );
+              }
+              return;
+            }
+
+            default: {
+              return this.skip()
+            }
+          }
         },
       });
     },
