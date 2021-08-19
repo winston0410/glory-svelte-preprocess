@@ -44,17 +44,44 @@ export const getClassName = (rule) => {
   return className;
 };
 
-export const getDeclaration = (declarationNode) => {
-  let declaration = "";
-  declaration += declarationNode.property;
-  for (const valueNode of declarationNode.value.children) {
-    if (valueNode.value) {
-      declaration += `:${valueNode.value}${valueNode.unit};`;
-    } else {
-      declaration += `:${valueNode.name};`;
+const stringifyDeclarationNode = (node) => {
+  switch (node.type) {
+    case "Url": {
+      return `url(${node.value.value})`;
+    }
+    case "HexColor": {
+      return `#${node.value}`;
+    }
+    case "Dimension": {
+      return `${node.value}${node.unit}`;
+    }
+    case "Percentage": {
+      return `${node.value}%`;
+    }
+    case "Function": {
+      let func = `${node.name}(`
+      for (const child of node.children) {
+        func += stringifyDeclarationNode(child)
+      }
+      return `${func})`
+    }
+
+    default: {
+      if (node.value) {
+        return node.value;
+      } else {
+        return node.name;
+      }
     }
   }
-  return declaration;
+};
+
+export const getDeclaration = (declarationNode) => {
+  let declaration = `${declarationNode.property}:`;
+  for (const valueNode of declarationNode.value.children) {
+    declaration += stringifyDeclarationNode(valueNode);
+  }
+  return `${declaration};`;
 };
 
 export const assembleRules = (cache) => {

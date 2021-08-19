@@ -13,12 +13,13 @@ describe("when given a javascript expression as class attribute", function () {
 
   const filename = "index.svelte";
 
+  const classCache = {};
+  const declarationCache = {};
+  const tokenizer = createTokenizer(classCache, declarationCache);
+  const ast = parse(code, { filename });
+  tokenizer.generateToken(ast.css, filename);
+  
   it("should fill the class cache correctly", function () {
-    const classCache = {};
-    const declarationCache = {};
-    const tokenizer = createTokenizer(classCache, declarationCache);
-    const ast = parse(code, { filename });
-    tokenizer.generateToken(ast.css, filename);
     expect(classCache).toStrictEqual({
       "index.svelte": { active: { a: true } },
     });

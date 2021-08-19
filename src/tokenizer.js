@@ -11,7 +11,7 @@ const tokenizeRules = (
   let generatedClassList = {};
   for (const declarationNode of rule.block.children) {
     const declaration = getDeclaration(declarationNode);
-
+    //  console.log('check declaration', declaration)
     if (!declarationCache[relatedAtRule]) {
       declarationCache[relatedAtRule] = {};
     }
