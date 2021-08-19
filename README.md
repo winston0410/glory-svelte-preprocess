@@ -1,6 +1,6 @@
 # glory-svelte-preprocess
 
-This plugin minimize your CSS classname in a revolutionary way for maximum performance.
+A svelte preprocess for safely minimizing CSS class footprint for unbeliveable performance gain. :rocket: :rocket: :rocket:
 
 ## tldr;
 
