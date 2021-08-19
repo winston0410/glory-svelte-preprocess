@@ -51,7 +51,8 @@ export const assembleRules = (cache) => {
 
   for (const mediaQuery in cache) {
     for (const property in cache[mediaQuery]) {
-      let rule = `.${cache[mediaQuery][property]}{${property}}`;
+      //  let rule = `.${cache[mediaQuery][property]}{${property}}`;
+      let rule = `:global(.${cache[mediaQuery][property]}){${property}}`;
       if (mediaQuery !== "none") {
         rule = `${mediaQuery}{${rule}}`;
       }
