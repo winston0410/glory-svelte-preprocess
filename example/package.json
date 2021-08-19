@@ -27,6 +27,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@sveltejs/adapter-static": "next"
+    "@sveltejs/adapter-static": "next",
+    "glory-svelte-preprocess": "^0.1.0"
   }
 }
