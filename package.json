@@ -11,7 +11,8 @@
     "example": "example"
   },
   "scripts": {
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules $(npm bin)/jest --watchAll"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules $(npm bin)/jest",
+    "dev": "cross-env NODE_OPTIONS=--experimental-vm-modules $(npm bin)/jest --watchAll"
   },
   "repository": {
     "type": "git",
