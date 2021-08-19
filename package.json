@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.1.0",
   "description": "A svelte preprocess to minimize and reuse CSS classname for maximum performance",
+  "files": [
+    "src/"
+  ],
   "main": "./src/index.js",
   "directories": {
     "example": "example"
