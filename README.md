@@ -13,6 +13,12 @@ Given the following input:
         font-size: 12px;
     }
 
+    @media screen and (min-width: 600px) {
+      .hello{
+        margin: none;
+      }
+    }
+
     .world{
         color: red;
         font-size: 16px;
@@ -41,13 +47,37 @@ This preprocess will turn this into the following output:
     .c{
         font-size: 16px;
     }
+
+    @media screen and (min-width: 600px) {
+      .d{
+        margin: none;
+      }
+    }
 </style>
 
-<h1 class="a b">This preprocess</h1>
+<h1 class="a b d">This preprocess</h1>
 <h2 class="a c">
     <p>does magic!</p>
 </h2>
 ```
+
+## FAQ
+
+###  No hash for classname?
+
+Unlike other CSS hashing solutions that hash based on the content of the stylesheet(e.g. CSS Module), Glory **hashes based on declarations**(declaration refers to the combination of property and value, like `font-size:20px`).
+
+With that, classnames are now irrelavent and that abstration layer is removed. You are basically writing declarations to the component directly, as if using inline `style` attribute, but everything in a nicer way.
+
+### Why do you turn everything global? Is there any scope for isolation?
+
+As the hash is built based on declarations, you can maximize the compression gain only if you share the hash across all components.
+
+Furthermore, with `:global()`, svelte will remove all injected `.svelte-xxxxxx` hash, compressing the CSS footprint to the very fine edge.
+
+Despite turning everything global, during compile time all pre-transformed classnames are **additionally hashed by filename**, therefore no additional hash is needed in the classname.
+
+This [test](https://github.com/winston0410/glory-svelte-preprocess/blob/master/src/scope.spec.js) verifies the scoping implementation.
 
 ## Installation
 
