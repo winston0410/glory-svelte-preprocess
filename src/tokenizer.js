@@ -10,7 +10,7 @@ const tokenizeRules = (
 ) => {
   let generatedClassList = {};
   for (const declarationNode of rule.block.children) {
-    const declaration = getDeclaration(declarationNode)
+    const declaration = getDeclaration(declarationNode);
 
     if (!declarationCache[relatedAtRule]) {
       declarationCache[relatedAtRule] = {};
@@ -29,14 +29,14 @@ const tokenizeRules = (
 
 const hydrateClassCache = (
   rule,
-  classCache,
+  tempCache,
   declarationCache,
   next,
   mediaQueryName
 ) => {
   const className = getClassName(rule);
-  classCache[className] = Object.assign(
-    classCache[className] ?? {},
+  tempCache[className] = Object.assign(
+    tempCache[className] ?? {},
     tokenizeRules(rule, declarationCache, next, mediaQueryName)
   );
 };
@@ -45,14 +45,16 @@ const createTokenizer = (classCache, declarationCache) => {
   const next = joli("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
 
   return {
-    generateToken(cssAst) {
+    generateToken(cssAst, filename) {
+      const tempCache = {};
+
       walk(cssAst, {
-        enter(node, parent, prop, index) {
+        enter(node) {
           switch (node.type) {
             case "Style": {
               for (const rule of node.children) {
                 if (rule.type === "Rule") {
-                  hydrateClassCache(rule, classCache, declarationCache, next);
+                  hydrateClassCache(rule, tempCache, declarationCache, next);
                 }
               }
               return;
@@ -68,7 +70,7 @@ const createTokenizer = (classCache, declarationCache) => {
               for (const rule of node.block.children) {
                 hydrateClassCache(
                   rule,
-                  classCache,
+                  tempCache,
                   declarationCache,
                   next,
                   mediaQueryName
@@ -83,6 +85,10 @@ const createTokenizer = (classCache, declarationCache) => {
           }
         },
       });
+
+      //  hydrate the classCache once only here
+      classCache[filename] = {};
+      Object.assign(classCache[filename], tempCache);
     },
   };
 };

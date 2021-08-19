@@ -13,10 +13,9 @@ export default function () {
       //  Ignore all default code
       if (!filename.includes(".svelte-kit")) {
         const ast = parse(content, { filename });
+        tokernizer.generateToken(ast.css, filename);
 
-        tokernizer.generateToken(ast.css);
-
-        const transformer = createTransformer(content);
+        const transformer = createTransformer(content, filename);
 
         const result = transformer
           .transformHtml(ast.html, classCache)

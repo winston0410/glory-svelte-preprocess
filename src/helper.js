@@ -24,7 +24,6 @@ export const getMediaQuery = (rule) => {
 export const getClassName = (rule) => {
   let className = "";
   for (const selectorNode of rule.prelude.children[0].children) {
-    console.log("check node", selectorNode);
     switch (selectorNode.type) {
       case "ClassSelector":
         className += selectorNode.name;
