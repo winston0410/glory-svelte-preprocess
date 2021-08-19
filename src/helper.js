@@ -49,7 +49,7 @@ const stringifyDeclarationNode = (node) => {
     case "Url": {
       return `url(${node.value.value})`;
     }
-    case "HexColor": {
+    case "Hash": {
       return `#${node.value}`;
     }
     case "Dimension": {

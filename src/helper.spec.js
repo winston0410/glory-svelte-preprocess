@@ -41,7 +41,7 @@ describe("when given a declaration with Hex code as value", function () {
       type: "Value",
       children: [
         {
-          type: "HexColor",
+          type: "Hash",
           value: "ffffff",
           start: 42,
           end: 49,
