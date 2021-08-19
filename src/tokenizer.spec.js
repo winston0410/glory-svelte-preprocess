@@ -50,7 +50,7 @@ describe("when given an dynamic javascript expression as class attribute", funct
   });
 });
 
-describe("when given a css declaration with psuedo selector", function () {
+describe("when given a css declaration with psuedo elements", function () {
   const code = `
 <style>
   .title::before{
@@ -67,11 +67,35 @@ describe("when given a css declaration with psuedo selector", function () {
   tokenizer.generateToken(ast.css);
 
   it("should fill the declaration cache correctly", function () {
-    console.log("check cache", classCache, declarationCache);
     expect(declarationCache).toStrictEqual({ none: { "color:green;": "a" } });
   });
 
   it("should fill the class cache correctly", function () {
     expect(classCache).toStrictEqual({ "title::before": { a: true } });
+  });
+});
+
+describe("when given a css declaration with psuedo class", function () {
+  const code = `
+<style>
+  .title:hover{
+    color: green;
+  }
+</style>
+
+<h1 class={"title"}></h1>`;
+
+  const classCache = {};
+  const declarationCache = {};
+  const tokenizer = createTokenizer(classCache, declarationCache);
+  const ast = parse(code, { filename: "" });
+  tokenizer.generateToken(ast.css);
+
+  it("should fill the declaration cache correctly", function () {
+    expect(declarationCache).toStrictEqual({ none: { "color:green;": "a" } });
+  });
+
+  it("should fill the class cache correctly", function () {
+    expect(classCache).toStrictEqual({ "title:hover": { a: true } });
   });
 });

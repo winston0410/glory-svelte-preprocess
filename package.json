@@ -8,7 +8,7 @@
     "example": "example"
   },
   "scripts": {
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules $(npm bin)/jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules $(npm bin)/jest --watchAll"
   },
   "repository": {
     "type": "git",
