@@ -2,7 +2,7 @@
   "name": "glory-svelte-preprocess",
   "type": "module",
   "version": "0.1.0",
-  "description": "A svelte preprocess to minimize and reuse CSS classname for maximum performance",
+  "description": "A svelte preprocess for safely minimizing CSS class footprint for unbeliveable performance gain. :rocket: :rocket: :rocket:",
   "files": [
     "src/"
   ],
