@@ -31,10 +31,39 @@ Given the following input:
 </h2>
 ```
 
-This preprocess will turn this into the following output:
+This preprocess will turn this into the following output in Svelte:
 
 ```svelte
 
+<style>
+    :global(.a){
+        color: red;
+    }
+
+    :global(.b){
+        font-size: 12px;
+    }
+
+    :global(.c){
+        font-size: 16px;
+    }
+
+    @media screen and (min-width: 600px) {
+      :global(.d){
+        margin: none;
+      }
+    }
+</style>
+
+<h1 class="a b d">This preprocess</h1>
+<h2 class="a c">
+    <p>does magic!</p>
+</h2>
+```
+
+And Svelte will generate the following HTML and CSS(should be external stylesheet, using `<style>` here for demo purpose):
+
+```html
 <style>
     .a{
         color: red;
