@@ -21,10 +21,12 @@ export default function (code, filename) {
                   changeable.overwrite(child.start, child.end, "");
                 }
               }
-              changeable.appendRight(
-                node.children[0].start,
-                assembleRules(cache)
-              );
+              if (node.children.length > 0) {
+                changeable.appendRight(
+                  node.children[0].start,
+                  assembleRules(cache)
+                );
+              }
               return;
             }
 
