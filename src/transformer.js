@@ -1,6 +1,11 @@
 import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
-import { getMediaQuery, getClassName, getDeclaration, assembleRules } from "./helper.js";
+import {
+  getMediaQuery,
+  getClassName,
+  getDeclaration,
+  assembleRules,
+} from "./helper.js";
 
 export default function (code, filename) {
   const changeable = new MagicString(code);
@@ -12,11 +17,14 @@ export default function (code, filename) {
           switch (node.type) {
             case "Style": {
               for (const child of node.children) {
-                  if (child.type === "Rule") {
-                      changeable.overwrite(child.start, child.end, "")
-                  }
+                if (child.type === "Rule") {
+                  changeable.overwrite(child.start, child.end, "");
+                }
               }
-              changeable.appendRight(node.children[0].start, assembleRules(cache))
+              changeable.appendRight(
+                node.children[0].start,
+                assembleRules(cache)
+              );
               return;
             }
 
@@ -24,7 +32,7 @@ export default function (code, filename) {
               if (node.name !== "media") {
                 return;
               }
-              return changeable.overwrite(node.start, node.end, "")
+              return changeable.overwrite(node.start, node.end, "");
             }
 
             default: {
@@ -50,7 +58,7 @@ export default function (code, filename) {
           for (const value of attrValue.raw.split(" ")) {
             let minifiedClass = "";
             let index = 0;
-            for (const token in cache[value]) {
+            for (const token in cache[filename][value]) {
               minifiedClass += index === 0 ? token : " " + token;
               index++;
             }
