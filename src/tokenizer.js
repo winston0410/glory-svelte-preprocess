@@ -1,6 +1,6 @@
 import joli from "@blackblock/joli-string";
 import { walk } from "svelte/compiler";
-import { getMediaQuery, getClassName, getDeclaration } from "./helper.js";
+import { getMediaQuery, getClassName, getDeclaration, getProxiedObject } from "./helper.js";
 
 const tokenizeRules = (
   rule,
@@ -11,10 +11,10 @@ const tokenizeRules = (
   let generatedClassList = {};
   for (const declarationNode of rule.block.children) {
     const declaration = getDeclaration(declarationNode);
-    //  console.log('check declaration', declaration)
-    if (!declarationCache[relatedAtRule]) {
-      declarationCache[relatedAtRule] = {};
-    }
+    
+    //  if (!declarationCache[relatedAtRule]) {
+      //  declarationCache[relatedAtRule] = {};
+    //  }
 
     const targetCache = declarationCache[relatedAtRule];
 
@@ -38,7 +38,7 @@ const hydrateClassCache = (
 ) => {
   const className = getClassName(rule);
   tempCache[className] = Object.assign(
-    tempCache[className] ?? {},
+    tempCache[className],
     tokenizeRules(rule, declarationCache, next, mediaQueryName)
   );
 };
@@ -48,7 +48,7 @@ const createTokenizer = (classCache, declarationCache) => {
 
   return {
     generateToken(cssAst, filename) {
-      const tempCache = {};
+      const tempCache = getProxiedObject();
 
       walk(cssAst, {
         enter(node) {
@@ -91,6 +91,7 @@ const createTokenizer = (classCache, declarationCache) => {
       //  hydrate the classCache once only here
       classCache[filename] = {};
       Object.assign(classCache[filename], tempCache);
+      //  cannot dedup classCache directly, as it is used to reference class in HTML
     },
   };
 };
