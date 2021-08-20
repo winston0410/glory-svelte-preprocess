@@ -1,11 +1,6 @@
 import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
-import {
-  getMediaQuery,
-  getClassName,
-  getDeclaration,
-  assembleRules,
-} from "./helper.js";
+import { assembleRules } from "./helper.js";
 
 export default function (code, filename) {
   const changeable = new MagicString(code);
