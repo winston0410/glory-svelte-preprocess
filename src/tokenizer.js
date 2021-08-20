@@ -22,6 +22,8 @@ const tokenizeRules = (
       const token = next();
       targetCache[declaration] = token;
       generatedClassList[token] = true;
+    } else {
+      generatedClassList[targetCache[declaration]] = true;
     }
   }
   return generatedClassList;
