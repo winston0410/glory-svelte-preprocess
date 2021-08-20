@@ -29,6 +29,45 @@ describe("when given multiple rules with identical declaration", function () {
   });
 });
 
+describe("when given multiple components", function () {
+  describe("when given multiple rules with identical declaration", function () {
+    const code1 = `
+<style>
+  .layout-1{
+    display: flex;
+  }
+</style>`;
+
+    const code2 = `
+<style>
+  .layout-2{
+    display: flex;
+  }
+</style>`;
+
+    const classCache = {};
+    const declarationCache = {};
+    const tokenizer = createTokenizer(classCache, declarationCache);
+
+    const list = [
+      [code1, "index.svelte"],
+      [code2, "dummy.svelte"],
+    ];
+
+    for (const [code, filename] of list) {
+      const ast = parse(code, { filename });
+      tokenizer.generateToken(ast.css, filename);
+    }
+
+    it("should share that token of that declaration in cache", function () {
+      expect(classCache).toStrictEqual({
+        "index.svelte": { "layout-1": { a: true } }, 
+        "dummy.svelte": { "layout-2": { a: true } },
+      });
+    });
+  });
+});
+
 describe("when given a javascript expression as class attribute", function () {
   const code = `
 <style>
