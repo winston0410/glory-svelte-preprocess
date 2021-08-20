@@ -1,0 +1,6 @@
+[submodule "benchmark/realworld"]
+	path = benchmark/realworld
+	url = git@github.com:sveltejs/realworld.git
+[submodule "benchmark/realworld-with-glory"]
+	path = benchmark/realworld-with-glory
+	url = git@github.com:sveltejs/realworld.git
