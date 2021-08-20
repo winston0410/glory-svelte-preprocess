@@ -36,9 +36,11 @@ describe("when processing multiple components", function () {
   it("should hashing classes of each component with filename in cache", async () => {
     expect(classCache).toStrictEqual({
         "filenameA": {
+            //  color:green; is now represented by class a
             "foo": {"a": true}
         },
         "filenameB":{
+            //  font-size:20px; is now represented by class b
             "foo": {"b": true}
         }
     })
