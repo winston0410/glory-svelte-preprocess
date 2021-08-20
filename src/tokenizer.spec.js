@@ -1,6 +1,34 @@
 import createTokenizer from "../src/tokenizer";
 import { parse } from "svelte/compiler";
 
+describe("when given multiple rules with identical declaration", function () {
+  const code = `
+<style>
+  .layout-1{
+    display: flex;
+  }
+      
+  .layout-2{
+    display: flex;
+  }
+</style>`;
+
+  const filename = "index.svelte";
+
+  const classCache = {};
+  const declarationCache = {};
+
+  const tokenizer = createTokenizer(classCache, declarationCache);
+  const ast = parse(code, { filename });
+  tokenizer.generateToken(ast.css, filename);
+
+  it("should share that token of that declaration in cache", function () {
+    expect(classCache).toStrictEqual({
+      "index.svelte": { "layout-1": { a: true }, "layout-2": { a: true } },
+    });
+  });
+});
+
 describe("when given a javascript expression as class attribute", function () {
   const code = `
 <style>
@@ -18,7 +46,7 @@ describe("when given a javascript expression as class attribute", function () {
   const tokenizer = createTokenizer(classCache, declarationCache);
   const ast = parse(code, { filename });
   tokenizer.generateToken(ast.css, filename);
-  
+
   it("should fill the class cache correctly", function () {
     expect(classCache).toStrictEqual({
       "index.svelte": { active: { a: true } },
