@@ -108,11 +108,25 @@ Despite turning everything global, during compile time all pre-transformed class
 
 This [test](https://github.com/winston0410/glory-svelte-preprocess/blob/master/test/scope.spec.js) verifies the scoping implementation.
 
+### Are global CSS lazy-loaded?
+
+Yes they are lazy-loaded by default. Declarations that are found in both components and `__layout.svelte` will be hoisted to it, or else it will be kept in its own stylesheet. Therefore the lazy-loaded feature of Svelte is preserved.
+
+However, you may observe a greater reduction in CSS size by serving all of them in `__layout.svelte` with `opts.serveOnceOnly: true`
+
 ## Installation
 
 ```sh
 npm install glory-svelte-preprocess
 ```
+
+## Options
+
+`gloryPreprocess` takes an object of options.
+
+`opts.serveOnceOnly`:
+
+Setting this to `true` will generate all classes in `__layout.svelte`
 
 ## Usage
 
