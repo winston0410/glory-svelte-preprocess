@@ -106,7 +106,7 @@ Furthermore, with `:global()`, svelte will remove all injected `.svelte-xxxxxx` 
 
 Despite turning everything global, during compile time all pre-transformed classnames are **additionally hashed by filename**, therefore no additional hash is needed in the classname.
 
-This [test](https://github.com/winston0410/glory-svelte-preprocess/blob/master/src/scope.spec.js) verifies the scoping implementation.
+This [test](https://github.com/winston0410/glory-svelte-preprocess/blob/master/test/scope.spec.js) verifies the scoping implementation.
 
 ## Installation
 
