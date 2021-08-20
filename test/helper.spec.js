@@ -1,4 +1,4 @@
-import { getDeclaration } from "./helper.js";
+import { getDeclaration } from "../src/helper.js";
 import { parse } from "svelte/compiler";
 import { walk } from "svelte/compiler";
 
