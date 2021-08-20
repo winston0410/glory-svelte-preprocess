@@ -1,4 +1,4 @@
-import createTransformer from "./transformer.js";
+import createTransformer from "../src/transformer.js";
 import { parse } from "svelte/compiler";
 
 describe("when transforming html", function () {
@@ -37,5 +37,41 @@ describe("when transforming html", function () {
       <p class="a"></p>
 `.replace(/\s/g, "")
     );
+  });
+});
+
+describe("when transforming CSS", function () {
+  const componentCode = `
+      <style>
+  .foo{
+    color: red;
+  }
+</style>
+<p class="foo">Hello world<p/>`;
+
+  const filename = "/src/index.svelte";
+
+  const classCache = {
+    "/src/__layout.svelte": { bar: { a: true } },
+    [filename]: { foo: { a: true } },
+  };
+
+  const declarationCache = {
+    none: { "color:red;": "a" },
+  };
+
+  describe("when identical declaration is found in __layout.svelte", function () {
+    const ast = parse(componentCode, { filename });
+    const transformer = createTransformer(componentCode, filename).transformCss(
+      ast.css,
+      declarationCache,
+      classCache,
+    );
+
+    it("should remove that declaration found in current component", async () => {
+      expect(transformer.toString().replace(/\s/g, "")).toBe(
+        `<style></style><p class="foo">Hello world<p/>`.replace(/\s/g, "")
+      );
+    });
   });
 });
