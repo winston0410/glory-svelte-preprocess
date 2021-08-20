@@ -12,10 +12,6 @@ const tokenizeRules = (
   for (const declarationNode of rule.block.children) {
     const declaration = getDeclaration(declarationNode);
     
-    //  if (!declarationCache[relatedAtRule]) {
-      //  declarationCache[relatedAtRule] = {};
-    //  }
-
     const targetCache = declarationCache[relatedAtRule];
 
     if (!targetCache[declaration]) {

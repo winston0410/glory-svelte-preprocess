@@ -1,10 +1,11 @@
 import { parse } from "svelte/compiler";
 import createTokenizer from "./tokenizer.js";
 import createTransformer from "./transformer.js";
+import { getProxiedObject } from './helper.js';
 
 //  Keep state outside default function as it will be called multiple times
-const classCache = {};
-const declarationCache = {};
+const classCache = getProxiedObject();
+const declarationCache = getProxiedObject();
 const tokernizer = createTokenizer(classCache, declarationCache);
 
 export default function () {
@@ -19,7 +20,7 @@ export default function () {
 
         const result = transformer
           .transformHtml(ast.html, classCache)
-          .transformCss(ast.css, declarationCache)
+          .transformCss(ast.css, declarationCache, classCache)
           .toString();
 
         return {

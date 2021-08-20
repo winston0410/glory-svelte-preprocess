@@ -59,11 +59,11 @@ const stringifyDeclarationNode = (node) => {
       return `${node.value}%`;
     }
     case "Function": {
-      let func = `${node.name}(`
+      let func = `${node.name}(`;
       for (const child of node.children) {
-        func += stringifyDeclarationNode(child)
+        func += stringifyDeclarationNode(child);
       }
-      return `${func})`
+      return `${func})`;
     }
 
     default: {
@@ -99,4 +99,18 @@ export const assembleRules = (cache) => {
   }
 
   return code;
+};
+
+export const getProxiedObject = () => {
+  return new Proxy(
+    {},
+    {
+      get: function (target,prop) {
+        if (!target[prop]) {
+          target[prop] = {};
+        }
+        return target[prop];
+      },
+    }
+  );
 };
