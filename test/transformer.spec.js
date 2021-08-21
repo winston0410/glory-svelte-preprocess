@@ -43,3 +43,39 @@ describe("when transforming html", function () {
     );
   });
 });
+
+describe("when transforming css", function () {
+  describe("when <style> does not exist", function () {
+    const code = `<p>hello</p>`;
+    const filename = `/src/routes/__layout.svelte`;
+
+    const declarationCache = {
+      none: {
+        "font-size:100px;": "a",
+      },
+    };
+
+    describe("when given an non-empty declaration cache", function () {
+      const ast = parse(code, { filename });
+      const parsedPath = path.parse(filename);
+      const transformer = createTransformer(code, parsedPath).transformCss(
+        ast.css,
+        declarationCache
+      );
+      it("should insert the styling correctly", async () => {
+        const result = transformer.toString();
+
+        expect(result.replace(/\s/g, "")).toBe(
+          `<style>
+        :global(.a){
+          font-size: 100px;
+        }
+      </style>
+
+      <p>hello</p>
+`.replace(/\s/g, "")
+        );
+      });
+    });
+  });
+});

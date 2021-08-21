@@ -2,11 +2,15 @@ import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
 import { assembleRules } from "./helper.js";
 
-export default function (code, {dir, base}) {
+export default function (code, { dir, base }) {
   const changeable = new MagicString(code);
 
   return {
     transformCss(ast, cache) {
+      if (!ast && Object.keys(cache).length > 0) {
+        changeable.appendRight(0, `<style>${assembleRules(cache)}</style>`);
+        return this;
+      }
       walk(ast, {
         enter(node) {
           switch (node.type) {
