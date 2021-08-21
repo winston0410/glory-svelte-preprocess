@@ -1,5 +1,6 @@
 import createTransformer from "../src/transformer.js";
 import { parse } from "svelte/compiler";
+import path from "path";
 
 describe("when transforming html", function () {
   const code = `
@@ -12,16 +13,19 @@ describe("when transforming html", function () {
 <p class="my-long-class-name"></p>
     `;
 
-  const filename = "index.svelte";
+  const filename = "/src/index.svelte";
 
   const classCache = {
-    [filename]: { "my-long-class-name": { a: true } },
-    "dummy.svelte": { "my-long-class-name": { b: true } },
+    "/src": {
+      "index.svelte": { "my-long-class-name": { a: true } },
+      "dummy.svelte": { "my-long-class-name": { b: true } },
+    },
   };
 
   it("should only transformed with classes associated with current component", function () {
     const ast = parse(code, { filename });
-    const transformer = createTransformer(code, filename).transformHtml(
+    const parsedPath = path.parse(filename);
+    const transformer = createTransformer(code, parsedPath).transformHtml(
       ast.html,
       classCache
     );

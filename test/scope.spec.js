@@ -1,6 +1,7 @@
 import createTokenizer from "../src/tokenizer";
 import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
+import path from "path";
 
 describe("when processing multiple components", function () {
   const classCache = getProxiedObject();
@@ -23,27 +24,30 @@ describe("when processing multiple components", function () {
 <p class="foo"></p>`;
 
   const codes = [
-    [componentA, "filenameA"],
-    [componentB, "filenameB"],
+    [componentA, "/src/filenameA"],
+    [componentB, "/src/filenameB"],
   ];
 
   const tokenizer = createTokenizer(classCache, declarationCache);
 
   for (const [code, filename] of codes) {
     const ast = parse(code, { filename });
-    tokenizer.generateToken(ast.css, filename);
+    const parsedPath = path.parse(filename);
+    tokenizer.generateToken(ast.css, parsedPath);
   }
 
   it("should hashing classes of each component with filename in cache", async () => {
     expect(classCache).toEqual(
       expect.objectContaining({
-        filenameA: {
-          //  color:green; is now represented by class a
-          foo: { a: true },
-        },
-        filenameB: {
-          //  font-size:20px; is now represented by class b
-          foo: { b: true },
+        "/src": {
+          filenameA: {
+            //  color:green; is now represented by class a
+            foo: { a: true },
+          },
+          filenameB: {
+            //  font-size:20px; is now represented by class b
+            foo: { b: true },
+          },
         },
       })
     );

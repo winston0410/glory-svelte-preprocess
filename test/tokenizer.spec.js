@@ -1,6 +1,7 @@
 import createTokenizer from "../src/tokenizer";
 import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
+import path from "path";
 
 describe("when given multiple rules with identical declaration", function () {
   const code = `
@@ -14,19 +15,22 @@ describe("when given multiple rules with identical declaration", function () {
   }
 </style>`;
 
-  const filename = "index.svelte";
+  const filename = "/src/index.svelte";
 
   const classCache = getProxiedObject();
   const declarationCache = getProxiedObject();
 
   const tokenizer = createTokenizer(classCache, declarationCache);
   const ast = parse(code, { filename });
-  tokenizer.generateToken(ast.css, filename);
+  const parsedPath = path.parse(filename);
+  tokenizer.generateToken(ast.css, parsedPath);
 
   it("should share that token of that declaration in cache", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
-        "index.svelte": { "layout-1": { a: true }, "layout-2": { a: true } },
+        "/src": {
+          "index.svelte": { "layout-1": { a: true }, "layout-2": { a: true } },
+        },
       })
     );
   });
@@ -53,20 +57,23 @@ describe("when given multiple components", function () {
     const tokenizer = createTokenizer(classCache, declarationCache);
 
     const list = [
-      [code1, "index.svelte"],
-      [code2, "dummy.svelte"],
+      [code1, "/src/index.svelte"],
+      [code2, "/src/dummy.svelte"],
     ];
 
     for (const [code, filename] of list) {
       const ast = parse(code, { filename });
-      tokenizer.generateToken(ast.css, filename);
+      const parsedPath = path.parse(filename);
+      tokenizer.generateToken(ast.css, parsedPath);
     }
 
     it("should share that token of that declaration in cache", function () {
       expect(classCache).toEqual(
         expect.objectContaining({
-          "index.svelte": { "layout-1": { a: true } },
-          "dummy.svelte": { "layout-2": { a: true } },
+          "/src": {
+            "index.svelte": { "layout-1": { a: true } },
+            "dummy.svelte": { "layout-2": { a: true } },
+          },
         })
       );
     });
@@ -83,18 +90,21 @@ describe("when given a javascript expression as class attribute", function () {
 
 <h1 class={"active"}></h1>`;
 
-  const filename = "index.svelte";
+  const filename = "/src/index.svelte";
 
   const classCache = getProxiedObject();
   const declarationCache = getProxiedObject();
   const tokenizer = createTokenizer(classCache, declarationCache);
   const ast = parse(code, { filename });
-  tokenizer.generateToken(ast.css, filename);
+  const parsedPath = path.parse(filename);
+  tokenizer.generateToken(ast.css, parsedPath);
 
   it("should fill the class cache correctly", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
-        "index.svelte": { active: { a: true } },
+        "/src": {
+          "index.svelte": { active: { a: true } },
+        },
       })
     );
   });
@@ -116,19 +126,22 @@ describe("when given an dynamic javascript expression as class attribute", funct
 
 <h1 class={isActive ? "active" : "inactive"}></h1>`;
 
-  const filename = "index.svelte";
+  const filename = "/src/index.svelte";
 
   it("should fill the class cache correctly", function () {
     const classCache = getProxiedObject();
     const declarationCache = getProxiedObject();
     const tokenizer = createTokenizer(classCache, declarationCache);
     const ast = parse(code, { filename });
-    tokenizer.generateToken(ast.css, filename);
+    const parsedPath = path.parse(filename);
+    tokenizer.generateToken(ast.css, parsedPath);
     expect(classCache).toEqual(
       expect.objectContaining({
-        "index.svelte": {
-          active: { a: true },
-          inactive: { b: true },
+        "/src": {
+          "index.svelte": {
+            active: { a: true },
+            inactive: { b: true },
+          },
         },
       })
     );
@@ -145,13 +158,15 @@ describe("when given a css declaration with psuedo elements", function () {
 
 <h1 class={"title"}></h1>`;
 
-  const filename = "index.svelte";
+  const filename = "/src/index.svelte";
 
   const classCache = getProxiedObject();
   const declarationCache = getProxiedObject();
   const tokenizer = createTokenizer(classCache, declarationCache);
   const ast = parse(code, { filename });
-  tokenizer.generateToken(ast.css, filename);
+
+  const parsedPath = path.parse(filename);
+  tokenizer.generateToken(ast.css, parsedPath);
 
   it("should fill the declaration cache correctly", function () {
     expect(declarationCache).toEqual(
@@ -162,7 +177,9 @@ describe("when given a css declaration with psuedo elements", function () {
   it("should fill the class cache correctly", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
-        "index.svelte": { "title::before": { a: true } },
+        "/src": {
+          "index.svelte": { "title::before": { a: true } },
+        },
       })
     );
   });
@@ -178,13 +195,15 @@ describe("when given a css declaration with psuedo class", function () {
 
 <h1 class={"title"}></h1>`;
 
-  const filename = "index.svelte";
+  const filename = "/src/index.svelte";
 
   const classCache = getProxiedObject();
   const declarationCache = getProxiedObject();
   const tokenizer = createTokenizer(classCache, declarationCache);
   const ast = parse(code, { filename });
-  tokenizer.generateToken(ast.css, filename);
+
+  const parsedPath = path.parse(filename);
+  tokenizer.generateToken(ast.css, parsedPath);
 
   it("should fill the declaration cache correctly", function () {
     expect(declarationCache).toEqual(
@@ -195,7 +214,9 @@ describe("when given a css declaration with psuedo class", function () {
   it("should fill the class cache correctly", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
-        "index.svelte": { "title:hover": { a: true } },
+        "/src": {
+          "index.svelte": { "title:hover": { a: true } },
+        },
       })
     );
   });
