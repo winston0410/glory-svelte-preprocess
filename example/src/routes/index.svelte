@@ -3,6 +3,9 @@
 </script>
 
 <style>
+    h1{
+        font-size: 40px;
+    }
     .hello{
         color: red;
         font-size: 12px;
