@@ -112,7 +112,7 @@ This [test](https://github.com/winston0410/glory-svelte-preprocess/blob/master/t
 
 Yes they are lazy-loaded by default. Declarations that are found in both components and `__layout.svelte` will be hoisted to it, or else it will be kept in its own stylesheet. Therefore the lazy-loaded feature of Svelte is preserved.
 
-However, you may observe a greater reduction in CSS size by serving all of them in `__layout.svelte` with `opts.serveOnceOnly: true`
+However, you may observe a greater reduction in CSS size by serving all of them in `__layout.svelte` with `opts.lazyLoad`
 
 ## Installation
 
@@ -124,9 +124,9 @@ npm install glory-svelte-preprocess
 
 `gloryPreprocess` takes an object of options.
 
-`opts.serveOnceOnly`:
+`opts.lazyLoad`(default to `true`)
 
-Setting this to `true` will generate all classes in `__layout.svelte`
+Setting this to `false` will generate all classes in `__layout.svelte`
 
 ## Usage
 

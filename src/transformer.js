@@ -2,7 +2,7 @@ import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
 import { assembleRules } from "./helper.js";
 
-export default function (code, filename) {
+export default function (code, filename, opts) {
   const changeable = new MagicString(code);
 
   return {

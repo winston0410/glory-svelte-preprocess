@@ -10,7 +10,12 @@ const hoistedClassCache = getProxiedObject();
 const declarationCache = getProxiedObject();
 const tokernizer = createTokenizer(classCache, declarationCache);
 
-export default function () {
+const defaultOpts = {
+    lazyLoad: true
+}
+
+export default function (opts = {}) {
+  Object.assign(opts, defaultOpts)
   return {
     markup: function ({ content, filename }) {
       //  Ignore all default code
@@ -18,7 +23,7 @@ export default function () {
         const ast = parse(content, { filename });
         tokernizer.generateToken(ast.css, filename);
 
-        const transformer = createTransformer(content, filename);
+        const transformer = createTransformer(content, filename, opts);
 
         hoistClass(classCache, hoistedClassCache);
         const hoistedDeclarationCache = hoistDeclaration(
