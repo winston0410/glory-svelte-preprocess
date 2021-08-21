@@ -56,6 +56,10 @@ export const getClassName = (rule) => {
       case 'WhiteSpace':
         className += selectorNode.value
         break;
+        
+      case 'Combinator':
+        className += selectorNode.name
+        break;
 
       default:
         break;

@@ -1,4 +1,4 @@
-import { getDeclaration } from "../src/helper.js";
+import { getDeclaration, getClassName } from "../src/helper.js";
 import { parse } from "svelte/compiler";
 import { walk } from "svelte/compiler";
 
@@ -126,6 +126,28 @@ describe("when given a declaration that uses string as its value", function () {
           return;
         }
         expect(getDeclaration(node)).toBe('content:"hello";');
+      },
+    });
+  });
+});
+
+describe("when given a rule that uses child combinator in selector", function () {
+  const code = `<style>
+  .hello>.world{
+    font-size: 20px;
+  }
+</style>`;
+
+  const ast = parse(code, { filename: "" });
+
+  it("should generate the selector correctly", function () {
+    walk(ast.css, {
+      enter(node) {
+        if (node.type !== "Rule") {
+          return;
+        }
+        const [selector] = getClassName(node)
+        expect(selector).toBe(".hello>.world")
       },
     });
   });
