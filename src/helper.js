@@ -23,6 +23,7 @@ export const getMediaQuery = (rule) => {
 
 export const getClassName = (rule) => {
   let className = "";
+  let shouldMinify = true
   for (const selectorNode of rule.prelude.children[0].children) {
     switch (selectorNode.type) {
       case "ClassSelector":
@@ -36,12 +37,27 @@ export const getClassName = (rule) => {
       case "PseudoClassSelector":
         className += `:${selectorNode.name}`;
         break;
+        
+      case "TypeSelector":
+        shouldMinify = false
+        className += `${selectorNode.name}`;
+        break;
+        
+      case "IdSelector":
+        shouldMinify = false
+        className += `#${selectorNode.name}`;
+        break;
+        
+      case "AttributeSelector":
+        shouldMinify = false
+        className += `[${selectorNode.name.name}${selectorNode.matcher}${selectorNode.value.value}]`;
+        break;
 
       default:
         break;
     }
   }
-  return className;
+  return [className, shouldMinify]
 };
 
 const stringifyDeclarationNode = (node) => {
