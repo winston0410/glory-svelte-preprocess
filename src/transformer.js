@@ -2,7 +2,7 @@ import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
 import { assembleRules } from "./helper.js";
 
-export default function (code, filename, opts) {
+export default function (code, {dir, base}) {
   const changeable = new MagicString(code);
 
   return {
@@ -55,7 +55,7 @@ export default function (code, filename, opts) {
           for (const value of attrValue.raw.split(" ")) {
             let minifiedClass = "";
             let index = 0;
-            for (const token in cache[filename][value]) {
+            for (const token in cache[dir][base][value]) {
               minifiedClass += index === 0 ? token : " " + token;
               index++;
             }

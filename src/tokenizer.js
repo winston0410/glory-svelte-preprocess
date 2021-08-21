@@ -43,7 +43,7 @@ const createTokenizer = (classCache, declarationCache) => {
   const next = joli("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
 
   return {
-    generateToken(cssAst, filename) {
+    generateToken(cssAst, {dir, base}) {
       const tempCache = getProxiedObject();
 
       walk(cssAst, {
@@ -83,11 +83,10 @@ const createTokenizer = (classCache, declarationCache) => {
           }
         },
       });
-
+      
       //  hydrate the classCache once only here
-      classCache[filename] = {};
-      Object.assign(classCache[filename], tempCache);
-      //  cannot dedup classCache directly, as it is used to reference class in HTML
+      classCache[dir][base] = {};
+      Object.assign(classCache[dir][base], tempCache);
     },
   };
 };
