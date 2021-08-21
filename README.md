@@ -65,34 +65,34 @@ And Svelte will generate the following HTML and CSS(should be external styleshee
 
 ```html
 <style>
-    .a{
-        color: red;
-    }
+  .a {
+    color: red;
+  }
 
-    .b{
-        font-size: 12px;
-    }
+  .b {
+    font-size: 12px;
+  }
 
-    .c{
-        font-size: 16px;
-    }
+  .c {
+    font-size: 16px;
+  }
 
-    @media screen and (min-width: 600px) {
-      .d{
-        margin: none;
-      }
+  @media screen and (min-width: 600px) {
+    .d {
+      margin: none;
     }
+  }
 </style>
 
 <h1 class="a b d">This preprocess</h1>
 <h2 class="a c">
-    <p>does magic!</p>
+  <p>does magic!</p>
 </h2>
 ```
 
 ## FAQ
 
-###  No hash for classname?
+### No hash for classname?
 
 Unlike other CSS hashing solutions that hash based on the content of the stylesheet(e.g. CSS Module), Glory **hashes based on declarations**(declaration refers to the combination of property and value, like `font-size:20px`).
 
@@ -114,6 +114,12 @@ Yes they are lazy-loaded by default. Declarations that are found in both compone
 
 However, you may observe a greater reduction in CSS size by serving all of them in `__layout.svelte` with `opts.lazyLoad`
 
+### Will this affect all my CSS?
+
+This preprocessor will only affect all CSS **defined inline** inside svelte-component, and those CSS rules with a selector composed of **class, pseudo classes or pseudo element** only.
+
+All unrelated rules will be kept untouched.
+
 ## Installation
 
 ```sh
@@ -133,23 +139,22 @@ Setting this to `false` will generate all classes in `__layout.svelte`
 Just import this preprocessor in your `svelte.config.js`
 
 ```javascript
-import gloryPreprocess from "glory-svelte-preprocess"
-import preprocess from 'svelte-preprocess';
+import gloryPreprocess from "glory-svelte-preprocess";
+import preprocess from "svelte-preprocess";
 
 const config = {
-	preprocess: [
-        gloryPreprocess(),
-		preprocess()
-	],
+  preprocess: [gloryPreprocess(), preprocess()],
 
-	kit: {
-		target: '#svelte',
-		adapter: adapter()
-	}
+  kit: {
+    target: "#svelte",
+    adapter: adapter(),
+  },
 };
 
 export default config;
 ```
+
+If you are using any preprocessor(e.g. `ScSS`, `PostCSS`) that works with non-standard CSS syntax, [set up the preprocess with a wrapper](https://github.com/winston0410/glory-svelte-preprocess/issues/2#issuecomment-903094873).
 
 ## Related project
 
