@@ -59,7 +59,7 @@ export default function (code, { dir, base }) {
           for (const value of attrValue.raw.split(" ")) {
             let minifiedClass = "";
             let index = 0;
-            for (const token in cache[dir][base][value]) {
+            for (const token in cache[dir][base][`.${value}`]) {
               minifiedClass += index === 0 ? token : " " + token;
               index++;
             }

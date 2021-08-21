@@ -17,8 +17,8 @@ describe("when transforming html", function () {
 
   const classCache = {
     "/src": {
-      "index.svelte": { "my-long-class-name": { a: true } },
-      "dummy.svelte": { "my-long-class-name": { b: true } },
+      "index.svelte": { ".my-long-class-name": { a: true } },
+      "dummy.svelte": { ".my-long-class-name": { b: true } },
     },
   };
 

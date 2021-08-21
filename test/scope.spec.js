@@ -42,11 +42,11 @@ describe("when processing multiple components", function () {
         "/src": {
           filenameA: {
             //  color:green; is now represented by class a
-            foo: { a: true },
+            ".foo": { a: true },
           },
           filenameB: {
             //  font-size:20px; is now represented by class b
-            foo: { b: true },
+            ".foo": { b: true },
           },
         },
       })

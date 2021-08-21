@@ -1,6 +1,11 @@
 import joli from "@blackblock/joli-string";
 import { walk } from "svelte/compiler";
-import { getMediaQuery, getClassName, getDeclaration, getProxiedObject } from "./helper.js";
+import {
+  getMediaQuery,
+  getClassName,
+  getDeclaration,
+  getProxiedObject,
+} from "./helper.js";
 
 const tokenizeRules = (
   rule,
@@ -11,7 +16,7 @@ const tokenizeRules = (
   let generatedClassList = {};
   for (const declarationNode of rule.block.children) {
     const declaration = getDeclaration(declarationNode);
-    
+
     const targetCache = declarationCache[relatedAtRule];
 
     if (!targetCache[declaration]) {
@@ -32,18 +37,22 @@ const hydrateClassCache = (
   next,
   mediaQueryName
 ) => {
-  const className = getClassName(rule);
-  tempCache[className] = Object.assign(
-    tempCache[className],
-    tokenizeRules(rule, declarationCache, next, mediaQueryName)
-  );
+  const [className, shouldMinify] = getClassName(rule);
+  if (shouldMinify) {
+    tempCache[className] = Object.assign(
+      tempCache[className],
+      tokenizeRules(rule, declarationCache, next, mediaQueryName)
+    );
+  } else {
+    //  TODO: handle other selector
+  }
 };
 
 const createTokenizer = (classCache, declarationCache) => {
   const next = joli("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
 
   return {
-    generateToken(cssAst, {dir, base}) {
+    generateToken(cssAst, { dir, base }) {
       const tempCache = getProxiedObject();
 
       walk(cssAst, {
@@ -83,7 +92,7 @@ const createTokenizer = (classCache, declarationCache) => {
           }
         },
       });
-      
+
       //  hydrate the classCache once only here
       classCache[dir][base] = {};
       Object.assign(classCache[dir][base], tempCache);
