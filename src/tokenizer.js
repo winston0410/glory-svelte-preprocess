@@ -43,8 +43,6 @@ const hydrateClassCache = (
       tempCache[className],
       tokenizeRules(rule, declarationCache, next, mediaQueryName)
     );
-  } else {
-    //  TODO: handle other selector
   }
 };
 

@@ -1,6 +1,6 @@
 import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
-import { assembleRules } from "./helper.js";
+import { assembleRules, getClassName } from "./helper.js";
 
 export default function (code, { dir, base }) {
   const changeable = new MagicString(code);
@@ -17,7 +17,9 @@ export default function (code, { dir, base }) {
             case "Style": {
               for (const child of node.children) {
                 if (child.type === "Rule") {
-                  changeable.overwrite(child.start, child.end, "");
+                  if (getClassName(child)[0]) {
+                    changeable.overwrite(child.start, child.end, "");
+                  }
                 }
               }
               if (node.children.length > 0) {

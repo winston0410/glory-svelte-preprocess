@@ -254,6 +254,4 @@ describe("when given a rule that uses id as selector", function () {
       })
     );
   });
-
-  it("should be stored in replicate cache", async () => {});
 });
