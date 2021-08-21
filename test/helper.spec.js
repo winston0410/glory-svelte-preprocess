@@ -97,7 +97,7 @@ describe("when given a declaration that uses var() as its value", function () {
 </style>`;
 
   const ast = parse(code, { filename: "" });
-  
+
   it("should parse it correctly", function () {
     walk(ast.css, {
       enter(node) {
@@ -105,6 +105,27 @@ describe("when given a declaration that uses var() as its value", function () {
           return;
         }
         expect(getDeclaration(node)).toBe("color:var(--highlight);");
+      },
+    });
+  });
+});
+
+describe("when given a declaration that uses string as its value", function () {
+  const code = `<style>
+  .test::before{
+    content:"hello";
+  }
+</style>`;
+
+  const ast = parse(code, { filename: "" });
+
+  it("should parse it correctly", function () {
+    walk(ast.css, {
+      enter(node) {
+        if (node.type !== "Declaration") {
+          return;
+        }
+        expect(getDeclaration(node)).toBe('content:"hello";');
       },
     });
   });
