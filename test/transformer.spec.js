@@ -85,7 +85,7 @@ describe("when transforming css", function () {
 
     const declarationCache = {
       none: {
-        "font-size:100px;": "a",
+        none: { "font-size:100px;": "a" },
       },
     };
 

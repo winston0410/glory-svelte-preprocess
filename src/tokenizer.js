@@ -4,7 +4,7 @@ import {
   getMediaQuery,
   getClassName,
   getDeclaration,
-  getProxiedObject,
+  getPseudoSelector,
   getSelectorNode,
 } from "./helper.js";
 
@@ -12,13 +12,23 @@ const tokenizeRules = (
   rule,
   declarationCache,
   next,
+  pseudo,
   relatedAtRule = "none"
 ) => {
   let generatedClassList = {};
+
+  if (!declarationCache[relatedAtRule]) {
+      declarationCache[relatedAtRule] = {}
+  }
+
+  if (!declarationCache[relatedAtRule][pseudo]) {
+      declarationCache[relatedAtRule][pseudo] = {}
+  }
+
+  const targetCache = declarationCache[relatedAtRule][pseudo]
+
   for (const declarationNode of rule.block.children) {
     const declaration = getDeclaration(declarationNode);
-
-    const targetCache = declarationCache[relatedAtRule];
 
     if (!targetCache[declaration]) {
       const token = next();
@@ -40,9 +50,12 @@ const hydrateClassCache = (
 ) => {
   const [, shouldMinify] = getClassName(rule);
   if (shouldMinify) {
+    const selector = getSelectorNode(rule);
+    const pseudo = getPseudoSelector(selector);
+
     tempCache.set(
-      getSelectorNode(rule),
-      tokenizeRules(rule, declarationCache, next, mediaQueryName)
+      selector,
+      tokenizeRules(rule, declarationCache, next, pseudo, mediaQueryName)
     );
   }
 };

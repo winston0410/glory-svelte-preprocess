@@ -1,14 +1,9 @@
 //  Black box testing here
-import gloryPreprocessor from "../src/index.js";
 import createTokenizer from "../src/tokenizer";
 import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
 import path from "path";
-
-const wrappedPreprocessor = (content, filename) => {
-  const { markup } = gloryPreprocessor();
-  return markup({ content: content, filename: filename });
-};
+import wrappedPreprocessor from './wrapper.js'
 
 describe("when given a rule with descendant combinator", function () {
   const code = `
@@ -195,6 +190,60 @@ color: #ff3e00;
     }
     </style>
     <h1 class="a"></h1>
+`.replace(/\s/g, "")
+    );
+  });
+});
+
+describe("when given a rule with pseudo class", function () {
+  it("should add class to the correct tag", function () {
+    const code = `
+<style>
+.hello:hover{
+  color: #ff3e00;
+}
+</style><div><h1 class="hello"></h1></div>`;
+
+    const filename = "/src/routes/index.svelte";
+
+    const result = wrappedPreprocessor(code, filename).code;
+
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+        :global(.a:hover){
+          color: #ff3e00;
+        }
+      </style>
+      <div>
+          <h1 class="a"></h1>
+      </div>
+`.replace(/\s/g, "")
+    );
+  });
+});
+
+describe("when given a rule with pseudo element", function () {
+  it("should add class to the correct tag", function () {
+    const code = `
+<style>
+.world::before{
+  color: #ff3e00;
+}
+</style><div><h1 class="world"></h1></div>`;
+
+    const filename = "/src/routes/index.svelte";
+
+    const result = wrappedPreprocessor(code, filename).code;
+
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+        :global(.a::before){
+          color: #ff3e00;
+        }
+      </style>
+      <div>
+          <h1 class="a"></h1>
+      </div>
 `.replace(/\s/g, "")
     );
   });

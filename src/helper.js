@@ -2,13 +2,13 @@ export const getAttribute = (elem, name) =>
   elem?.attributes.find((attr) => attr.name === name);
 
 export const getInjectionSlot = (elem) => {
-  let start, end
-  let append = false
-  
+  let start, end;
+  let append = false;
+
   if (elem.attributes.length < 1) {
-    append = true
-    end = elem.start + elem.name.length + 1
-    return [append, start, end]
+    append = true;
+    end = elem.start + elem.name.length + 1;
+    return [append, start, end];
   }
   const classAttr = getAttribute(elem, "class");
   if (classAttr) {
@@ -16,9 +16,9 @@ export const getInjectionSlot = (elem) => {
     start = classAttrValue.start;
     end = classAttrValue.end;
   } else {
-    const lastAttr = elem.attributes[elem.attributes.length - 1].value[0]
-    end = lastAttr.end + 1
-    append = true
+    const lastAttr = elem.attributes[elem.attributes.length - 1].value[0];
+    end = lastAttr.end + 1;
+    append = true;
   }
 
   return [append, start, end];
@@ -138,12 +138,15 @@ export const assembleRules = (cache) => {
   let code = "";
 
   for (const mediaQuery in cache) {
-    for (const property in cache[mediaQuery]) {
-      let rule = `:global(.${cache[mediaQuery][property]}){${property}}`;
-      if (mediaQuery !== "none") {
-        rule = `${mediaQuery}{${rule}}`;
+    for (const pseudo in cache[mediaQuery]) {
+      for (const property in cache[mediaQuery][pseudo]) {
+        const className = cache[mediaQuery][pseudo][property] + (pseudo !== "none" ? pseudo : "");
+        let rule = `:global(.${className}){${property}}`;
+        if (mediaQuery !== "none") {
+          rule = `${mediaQuery}{${rule}}`;
+        }
+        code += rule;
       }
-      code += rule;
     }
   }
 
@@ -175,6 +178,12 @@ export const matchWithSelector = (element, selector) => {
         return true;
       }
       return false;
+    }
+    case "PseudoElementSelector": {
+      return true;
+    }
+    case "PseudoClassSelector": {
+      return true;
     }
   }
 
@@ -216,36 +225,54 @@ export const getMinifiedToken = (tokenList) => {
 
 //  Not using a generator function here, as slower in performance due to context switch
 export const createGenerator = (list) => {
-  let index = list.length - 1
+  let index = list.length - 1;
   return {
-    prev(){
-        if (index < 0) {
-            return null
-        }
-        const result = list[index--]
-        return result
+    prev() {
+      if (index < 0) {
+        return null;
+      }
+      const result = list[index--];
+      return result;
     },
-    getIndex(){
-        return index + 1
+    getIndex() {
+      return index + 1;
     },
-    length(){
-        return list.length
-    }
+    length() {
+      return list.length;
+    },
   };
-}
+};
 
 export const isCombinator = (selector) => {
-    switch (selector.type) {
-        case 'WhiteSpace':{
-            return selector.value
-        }
-
-        case 'Combinator':{
-            return selector.name
-        }
-
-        default:{
-            return false
-        }
+  switch (selector.type) {
+    case "WhiteSpace": {
+      return selector.value;
     }
-}
+
+    case "Combinator": {
+      return selector.name;
+    }
+
+    default: {
+      return false;
+    }
+  }
+};
+
+export const getPseudoSelector = (selector) => {
+  const pseudo = selector.children.find(
+    (n) =>
+      n.type === "PseudoClassSelector" || n.type === "PseudoElementSelector"
+  );
+  if (!pseudo) {
+    return "none";
+  }
+  switch (pseudo.type) {
+    case "PseudoClassSelector": {
+      return `:${pseudo.name}`;
+    }
+    case "PseudoElementSelector": {
+      return `::${pseudo.name}`;
+    }
+  }
+};
