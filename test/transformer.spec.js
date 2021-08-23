@@ -17,8 +17,42 @@ describe("when transforming html", function () {
 
   const classCache = {
     "/src": {
-      "index.svelte": { ".my-long-class-name": { a: true } },
-      "dummy.svelte": { ".my-long-class-name": { b: true } },
+      "index.svelte": new Map([
+        [
+          {
+            type: "Selector",
+            children: [
+              {
+                type: "ClassSelector",
+                name: "my-long-class-name",
+                start: 10,
+                end: 29,
+              },
+            ],
+            start: 10,
+            end: 29,
+          },
+          { a: true },
+        ],
+      ]),
+      "dummy.svelte": new Map([
+        [
+          {
+            type: "Selector",
+            children: [
+              {
+                type: "ClassSelector",
+                name: "my-long-class-name",
+                start: 10,
+                end: 29,
+              },
+            ],
+            start: 10,
+            end: 29,
+          },
+          { b: true },
+        ],
+      ]),
     },
   };
 

@@ -90,6 +90,24 @@ And Svelte will generate the following HTML and CSS(should be external styleshee
 </h2>
 ```
 
+## Supported selectors
+
+This preprocess will transform rules with the following selectors:
+
+[x] Id Selector `#foo`
+
+[x] Class Selector `.foo`
+
+[ ] Attribute Selector `li[title]`
+
+[x] Descendant combinator `.foo .bar` 
+
+[x] Child combinator `.foo>.bar` 
+
+[ ] Adjacent sibling combinator `.foo+.bar` 
+
+[ ] General sibling combinator `.foo~.bar` 
+
 ## FAQ
 
 ### No hash for classname?

@@ -164,28 +164,22 @@ export const getProxiedObject = () => {
   );
 };
 
-export const hasMatchingSelector = (element, selector) => {
+export const matchWithSelector = (element, selector) => {
   if (element.type === "Fragment") {
-    return [false];
+    return false;
   }
 
   switch (selector.type) {
-    case "WhiteSpace": {
-      return [true, " "];
-    }
-    case "Combinator": {
-      return [true, selector.name];
-    }
     case "TypeSelector": {
       if (element.name === selector.name) {
-        return [true];
+        return true;
       }
-      return [false];
+      return false;
     }
   }
 
   if (element.attributes.length < 1) {
-    return [false];
+    return false;
   }
 
   switch (selector.type) {
@@ -193,21 +187,21 @@ export const hasMatchingSelector = (element, selector) => {
       const attr = getAttribute(element, "class");
       for (const className of attr.value[0].raw.split(" ")) {
         if (className === selector.name) {
-          return [true];
+          return true;
         }
       }
-      return [false];
+      return false;
     }
     case "IdSelector": {
       const attr = getAttribute(element, "id");
       if (attr.value[0].raw === selector.name) {
-        return [true];
+        return true;
       }
-      return [false];
+      return false;
     }
   }
 
-  return [false];
+  return false;
 };
 
 export const getMinifiedToken = (tokenList) => {
@@ -220,18 +214,39 @@ export const getMinifiedToken = (tokenList) => {
   return minified;
 };
 
-export function createReverseLoop(list) {
-  let done = false;
+//  Not using a generator function here, as slower in performance due to context switch
+export const createGenerator = (list) => {
+  let index = list.length - 1
   return {
-    loop(cb) {
-      let index = list.length - 1;
-      while (index > -1 && !done) {
-        cb(list[index], index);
-        index--;
-      }
+    prev(){
+        if (index < 0) {
+            return null
+        }
+        const result = list[index]
+        index --
+        return result
     },
-    break() {
-      done = true;
+    getIndex(){
+        return index
     },
+    length(){
+        return list.length
+    }
   };
+}
+
+export const isCombinator = (selector) => {
+    switch (selector.type) {
+        case 'WhiteSpace':{
+            return selector.value
+        }
+
+        case 'Combinator':{
+            return selector.name
+        }
+
+        default:{
+            return false
+        }
+    }
 }

@@ -1,6 +1,55 @@
 import MagicString from "magic-string";
 import { walk } from "svelte/compiler";
-import { assembleRules, getClassName } from "./helper.js";
+import {
+  assembleRules,
+  getClassName,
+  matchWithSelector,
+  getMinifiedToken,
+  getAttribute,
+  createGenerator,
+  isCombinator,
+} from "./helper.js";
+import createLinker from "./linker.js";
+
+const isTargetElement = (selectorNode, node, linker) => {
+  let found = true;
+  let matchCount = 0;
+
+  const r = createGenerator(selectorNode.children);
+
+  let curNode = node;
+  let selector = r.prev();
+
+  while (r.getIndex() > -1) {
+    if (!curNode) {
+        linker.reveal()
+        return false
+    }
+    //  console.log("run count", index, selector, curNode);
+    const combinator = isCombinator(selector)
+    if (combinator) {
+      curNode = linker.getParent(curNode);
+      selector = r.prev();
+      if (combinator === ">") {
+          //  prevent linker from providing more than one node for finding direct parent
+          linker.hide(curNode)
+      } 
+    } else {
+      const isMatch = matchWithSelector(curNode, selector);
+      if (isMatch) {
+        selector = r.prev();
+        matchCount++;
+        if (r.length() === matchCount) {
+          found = true;
+        }
+      } else {
+        curNode = linker.getParent(curNode);
+      }
+    }
+  }
+
+  return found;
+};
 
 export default function (code, { dir, base }) {
   const changeable = new MagicString(code);
@@ -47,28 +96,29 @@ export default function (code, { dir, base }) {
       return this;
     },
     transformHtml(ast, cache) {
+      const replaceList = cache[dir][base];
+      const linker = createLinker();
+
       walk(ast, {
-        enter(node) {
-          if (node.type !== "Attribute") {
-            return;
-          }
-          if (node.name !== "class") {
+        enter(node, parent) {
+          if (node.type !== "Element") {
             return;
           }
 
-          const attrValue = node.value[0];
+          linker.link(node, parent);
 
-          for (const value of attrValue.raw.split(" ")) {
-            let minifiedClass = "";
-            let index = 0;
-            for (const token in cache[dir][base][`.${value}`]) {
-              minifiedClass += index === 0 ? token : " " + token;
-              index++;
+          for (const selectorNode of replaceList.keys()) {
+            const result = isTargetElement(selectorNode, node, linker);
+
+            if (result) {
+              const minified = getMinifiedToken(replaceList.get(selectorNode));
+              const slot = getAttribute(node, "class").value[0];
+              changeable.overwrite(slot.start, slot.end, minified);
             }
-            changeable.overwrite(attrValue.start, attrValue.end, minifiedClass);
           }
         },
       });
+
       return this;
     },
     toString() {
