@@ -29,7 +29,40 @@ describe("when given multiple rules with identical declaration", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
         "/src": {
-          "index.svelte": { ".layout-1": { a: true }, ".layout-2": { a: true } },
+          "index.svelte": new Map([
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "layout-1",
+                    start: 10,
+                    end: 19,
+                  },
+                ],
+                start: 10,
+                end: 19,
+              },
+              { a: true },
+            ],
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "layout-2",
+                    start: 53,
+                    end: 62,
+                  },
+                ],
+                start: 53,
+                end: 62,
+              },
+              { a: true },
+            ],
+          ]),
         },
       })
     );
@@ -71,8 +104,42 @@ describe("when given multiple components", function () {
       expect(classCache).toEqual(
         expect.objectContaining({
           "/src": {
-            "index.svelte": { ".layout-1": { a: true } },
-            "dummy.svelte": { ".layout-2": { a: true } },
+            "index.svelte": new Map([
+              [
+                {
+                  type: "Selector",
+                  children: [
+                    {
+                      type: "ClassSelector",
+                      name: "layout-1",
+                      start: 10,
+                      end: 19,
+                    },
+                  ],
+                  start: 10,
+                  end: 19,
+                },
+                { a: true },
+              ],
+            ]),
+            "dummy.svelte": new Map([
+              [
+                {
+                  type: "Selector",
+                  children: [
+                    {
+                      type: "ClassSelector",
+                      name: "layout-2",
+                      start: 10,
+                      end: 19,
+                    },
+                  ],
+                  start: 10,
+                  end: 19,
+                },
+                { a: true },
+              ],
+            ]),
           },
         })
       );
@@ -103,7 +170,24 @@ describe("when given a javascript expression as class attribute", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
         "/src": {
-          "index.svelte": { ".active": { a: true } },
+          "index.svelte": new Map([
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "active",
+                    start: 10,
+                    end: 17,
+                  },
+                ],
+                start: 10,
+                end: 17,
+              },
+              { a: true },
+            ],
+          ]),
         },
       })
     );
@@ -111,7 +195,8 @@ describe("when given a javascript expression as class attribute", function () {
 });
 
 describe("when given an dynamic javascript expression as class attribute", function () {
-  const code = `<script>
+  const code = `
+<script>
   export let isActive = true
 </script>
 
@@ -138,10 +223,40 @@ describe("when given an dynamic javascript expression as class attribute", funct
     expect(classCache).toEqual(
       expect.objectContaining({
         "/src": {
-          "index.svelte": {
-            ".active": { a: true },
-            ".inactive": { b: true },
-          },
+          "index.svelte": new Map([
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "active",
+                    start: 59,
+                    end: 66,
+                  },
+                ],
+                start: 59,
+                end: 66,
+              },
+              { a: true },
+            ],
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "inactive",
+                    start: 92,
+                    end: 101,
+                  },
+                ],
+                start: 92,
+                end: 101,
+              },
+              { b: true },
+            ],
+          ]),
         },
       })
     );
@@ -178,7 +293,31 @@ describe("when given a css declaration with psuedo elements", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
         "/src": {
-          "index.svelte": { ".title::before": { a: true } },
+          "index.svelte": new Map([
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "title",
+                    start: 10,
+                    end: 16,
+                  },
+                  {
+                    type: "PseudoElementSelector",
+                    name: "before",
+                    children: null,
+                    start: 16,
+                    end: 24,
+                  },
+                ],
+                start: 10,
+                end: 24,
+              },
+              { a: true },
+            ],
+          ]),
         },
       })
     );
@@ -215,41 +354,31 @@ describe("when given a css declaration with psuedo class", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
         "/src": {
-          "index.svelte": { ".title:hover": { a: true } },
-        },
-      })
-    );
-  });
-});
-
-describe("when given a rule that uses id as selector", function () {
-  const code = `
-<style>
-  h1{
-    font-size: 20rem;
-  }
-  .title:hover{
-    color: green;
-  }
-</style>
-
-<h1 class={"title"}></h1>`;
-
-  const filename = "/src/index.svelte";
-
-  const classCache = getProxiedObject();
-  const declarationCache = getProxiedObject();
-  const tokenizer = createTokenizer(classCache, declarationCache);
-  const ast = parse(code, { filename });
-  
-  const parsedPath = path.parse(filename);
-  tokenizer.generateToken(ast.css, parsedPath);
-  
-  it("should not be stored in declaration cache", () => {
-    expect(classCache).toEqual(
-      expect.objectContaining({
-        "/src": {
-          "index.svelte": { ".title:hover": { a: true } },
+          "index.svelte": new Map([
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "title",
+                    start: 10,
+                    end: 16,
+                  },
+                  {
+                    type: "PseudoClassSelector",
+                    name: "hover",
+                    children: null,
+                    start: 16,
+                    end: 22,
+                  },
+                ],
+                start: 10,
+                end: 22,
+              },
+              { a: true },
+            ],
+          ]),
         },
       })
     );

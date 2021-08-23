@@ -40,14 +40,44 @@ describe("when processing multiple components", function () {
     expect(classCache).toEqual(
       expect.objectContaining({
         "/src": {
-          filenameA: {
-            //  color:green; is now represented by class a
-            ".foo": { a: true },
-          },
-          filenameB: {
-            //  font-size:20px; is now represented by class b
-            ".foo": { b: true },
-          },
+          filenameA: new Map([
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "foo",
+                    start: 10,
+                    end: 14,
+                  },
+                ],
+                start: 10,
+                end: 14,
+              },
+              //  color:green; is now represented by class a
+              { a: true },
+            ],
+          ]),
+          filenameB: new Map([
+            [
+              {
+                type: "Selector",
+                children: [
+                  {
+                    type: "ClassSelector",
+                    name: "foo",
+                    start: 10,
+                    end: 14,
+                  },
+                ],
+                start: 10,
+                end: 14,
+              },
+              //  font-size:20px; is now represented by class b
+              { b: true },
+            ],
+          ]),
         },
       })
     );

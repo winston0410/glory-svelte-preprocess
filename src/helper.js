@@ -1,3 +1,27 @@
+import { walk } from "svelte/compiler";
+
+export const getAttribute = (elem, name) =>
+  elem?.attributes.find((attr) => attr.name === name);
+
+export const getInjectionSlot = (elem) => {
+  let start, end;
+  if (elem.attributes.length < 1) {
+    //  TODO:
+    return;
+  }
+  const classAttr = getAttribute(elem, "class");
+  if (classAttr) {
+    const classAttrValue = classAttr.value[0];
+    start = classAttrValue.start;
+    end = classAttrValue.end;
+  } else {
+    //  TODO: find the last attribute
+    //  const lastAttr = elem.attributes[
+  }
+
+  return [start, end];
+};
+
 export const getMediaQuery = (rule) => {
   let name = "@" + rule.name;
   for (const child of rule.prelude.children[0].children[0].children) {
@@ -21,10 +45,12 @@ export const getMediaQuery = (rule) => {
   return name;
 };
 
+export const getSelectorNode = (rule) => rule.prelude.children[0];
+
 export const getClassName = (rule) => {
   let className = "";
-  let shouldMinify = true
-  for (const selectorNode of rule.prelude.children[0].children) {
+  let shouldMinify = true;
+  for (const selectorNode of getSelectorNode(rule).children) {
     switch (selectorNode.type) {
       case "ClassSelector":
         className += `.${selectorNode.name}`;
@@ -37,35 +63,35 @@ export const getClassName = (rule) => {
       case "PseudoClassSelector":
         className += `:${selectorNode.name}`;
         break;
-        
+
       case "TypeSelector":
-        shouldMinify = false
+        shouldMinify = false;
         className += `${selectorNode.name}`;
         break;
-        
+
       case "IdSelector":
-        shouldMinify = false
+        shouldMinify = false;
         className += `#${selectorNode.name}`;
         break;
-        
+
       case "AttributeSelector":
-        shouldMinify = false
+        shouldMinify = false;
         className += `[${selectorNode.name.name}${selectorNode.matcher}${selectorNode.value.value}]`;
         break;
 
-      case 'WhiteSpace':
-        className += selectorNode.value
+      case "WhiteSpace":
+        className += selectorNode.value;
         break;
-        
-      case 'Combinator':
-        className += selectorNode.name
+
+      case "Combinator":
+        className += selectorNode.name;
         break;
 
       default:
         break;
     }
   }
-  return [className, shouldMinify]
+  return [className, shouldMinify];
 };
 
 const stringifyDeclarationNode = (node) => {
@@ -128,7 +154,7 @@ export const getProxiedObject = () => {
   return new Proxy(
     {},
     {
-      get: function (target,prop) {
+      get: function (target, prop) {
         if (!target[prop]) {
           target[prop] = {};
         }
@@ -137,3 +163,75 @@ export const getProxiedObject = () => {
     }
   );
 };
+
+export const hasMatchingSelector = (element, selector) => {
+  if (element.type === "Fragment") {
+    return [false];
+  }
+
+  switch (selector.type) {
+    case "WhiteSpace": {
+      return [true, " "];
+    }
+    case "Combinator": {
+      return [true, selector.name];
+    }
+    case "TypeSelector": {
+      if (element.name === selector.name) {
+        return [true];
+      }
+      return [false];
+    }
+  }
+
+  if (element.attributes.length < 1) {
+    return [false];
+  }
+
+  switch (selector.type) {
+    case "ClassSelector": {
+      const attr = getAttribute(element, "class");
+      for (const className of attr.value[0].raw.split(" ")) {
+        if (className === selector.name) {
+          return [true];
+        }
+      }
+      return [false];
+    }
+    case "IdSelector": {
+      const attr = getAttribute(element, "id");
+      if (attr.value[0].raw === selector.name) {
+        return [true];
+      }
+      return [false];
+    }
+  }
+
+  return [false];
+};
+
+export const getMinifiedToken = (tokenList) => {
+  let minified = "";
+  let index = 0;
+  for (const token in tokenList) {
+    minified += index === 0 ? token : " " + token;
+    index++;
+  }
+  return minified;
+};
+
+export function createReverseLoop(list) {
+  let done = false;
+  return {
+    loop(cb) {
+      let index = list.length - 1;
+      while (index > -1 && !done) {
+        cb(list[index], index);
+        index--;
+      }
+    },
+    break() {
+      done = true;
+    },
+  };
+}

@@ -5,6 +5,7 @@ import {
   getClassName,
   getDeclaration,
   getProxiedObject,
+  getSelectorNode,
 } from "./helper.js";
 
 const tokenizeRules = (
@@ -37,10 +38,10 @@ const hydrateClassCache = (
   next,
   mediaQueryName
 ) => {
-  const [className, shouldMinify] = getClassName(rule);
+  const [, shouldMinify] = getClassName(rule);
   if (shouldMinify) {
-    tempCache[className] = Object.assign(
-      tempCache[className],
+    tempCache.set(
+      getSelectorNode(rule),
       tokenizeRules(rule, declarationCache, next, mediaQueryName)
     );
   }
@@ -51,7 +52,7 @@ const createTokenizer = (classCache, declarationCache) => {
 
   return {
     generateToken(cssAst, { dir, base }) {
-      const tempCache = getProxiedObject();
+      const tempCache = new Map();
 
       walk(cssAst, {
         enter(node) {
@@ -92,8 +93,7 @@ const createTokenizer = (classCache, declarationCache) => {
       });
 
       //  hydrate the classCache once only here
-      classCache[dir][base] = {};
-      Object.assign(classCache[dir][base], tempCache);
+      classCache[dir][base] = tempCache;
     },
   };
 };
