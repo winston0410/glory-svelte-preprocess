@@ -5,7 +5,6 @@ import {
   getClassName,
   matchWithSelector,
   getMinifiedToken,
-  getAttribute,
   getInjectionSlot,
   createGenerator,
   isCombinator,
@@ -13,7 +12,7 @@ import {
 import createLinker from "./linker.js";
 
 const isTargetElement = (selectorNode, node, linker) => {
-  let found = true;
+  let found = false;
   let matchCount = 0;
 
   const r = createGenerator(selectorNode.children);
@@ -22,15 +21,20 @@ const isTargetElement = (selectorNode, node, linker) => {
   let selector = r.prev();
 
   while (r.getIndex() > -1) {
+    //  For debug
+    //  console.log("check selector", selector);
+    //  console.log("check node", curNode);
+    //  console.log('check index', r.getIndex(), ' match cound: ', matchCount)
+
     if (!curNode) {
       linker.reveal();
       return false;
     }
-    //  console.log("run count", index, selector, curNode);
     const combinator = isCombinator(selector);
     if (combinator) {
       curNode = linker.getParent(curNode);
       selector = r.prev();
+      matchCount ++
       if (combinator === ">") {
         //  prevent linker from providing more than one node for finding direct parent
         linker.hide(curNode);
@@ -42,6 +46,7 @@ const isTargetElement = (selectorNode, node, linker) => {
         matchCount++;
         if (r.length() === matchCount) {
           found = true;
+          return found
         }
       } else {
         curNode = linker.getParent(curNode);
@@ -115,7 +120,7 @@ export default function (code, { dir, base }) {
               const minified = getMinifiedToken(replaceList.get(selectorNode));
               const [append, start, end] = getInjectionSlot(node);
               if (append) {
-                changeable.appendRight(end, `class="${minified}"`)
+                changeable.appendRight(end, `class="${minified}"`);
               } else {
                 changeable.overwrite(start, end, minified);
               }

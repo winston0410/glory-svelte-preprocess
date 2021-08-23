@@ -1,7 +1,6 @@
 //  Black box testing here
 import gloryPreprocessor from "../src/index.js";
 import createTokenizer from "../src/tokenizer";
-import createTransformer from "../src/transformer.js";
 import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
 import path from "path";
@@ -98,7 +97,7 @@ describe("when given a rule with descendant combinator", function () {
 });
 
 describe("when given a rule with child combinator", function () {
-  it("should add class to its direct child HTML tag", function () {
+  it("should add class to its direct child", function () {
     const code = `
 <style>
 .main>.h1{
@@ -123,32 +122,32 @@ describe("when given a rule with child combinator", function () {
     );
   });
 
-  //  it("should not add class to other HTML tag", function () {
-    //  const code = `
-//  <style>
-//  .main>.h1{
-  //  color: #ff3e00;
-//  }
-//  </style><main class="main"><div><h1 class="h1"></h1></div></main>`;
+  it("should not add class in other level", function () {
+    const code = `
+<style>
+.main>.h1{
+  color: #ff3e00;
+}
+</style><main class="main"><div><h1 class="h1"></h1></div></main>`;
 
-    //  const filename = "/src/routes/index.svelte";
+    const filename = "/src/routes/index.svelte";
 
-    //  const result = wrappedPreprocessor(code, filename).code;
+    const result = wrappedPreprocessor(code, filename).code;
 
-    //  expect(result.replace(/\s/g, "")).toBe(
-      //  `<style>
-        //  :global(.a){
-          //  color: #ff3e00;
-        //  }
-      //  </style>
-      //  <main class="main">
-          //  <div>
-          //  <h1 class="h1"></h1>
-          //  </div>
-      //  </main>
-//  `.replace(/\s/g, "")
-    //  );
-  //  });
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+        :global(.a){
+          color: #ff3e00;
+        }
+      </style>
+      <main class="main">
+          <div>
+          <h1 class="h1"></h1>
+          </div>
+      </main>
+`.replace(/\s/g, "")
+    );
+  });
 });
 
 describe("when given a rule with id selector", function () {

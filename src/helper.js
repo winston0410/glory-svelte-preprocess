@@ -222,12 +222,11 @@ export const createGenerator = (list) => {
         if (index < 0) {
             return null
         }
-        const result = list[index]
-        index --
+        const result = list[index--]
         return result
     },
     getIndex(){
-        return index
+        return index + 1
     },
     length(){
         return list.length
