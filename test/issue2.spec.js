@@ -1,8 +1,15 @@
+//  Black box testing here
+import gloryPreprocessor from "../src/index.js";
 import createTokenizer from "../src/tokenizer";
 import createTransformer from "../src/transformer.js";
 import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
 import path from "path";
+
+const wrappedPreprocessor = (content, filename) => {
+  const { markup } = gloryPreprocessor();
+  return markup({ content: content, filename: filename });
+};
 
 describe("when given a rule with descendant combinator", function () {
   const code = `
@@ -74,19 +81,7 @@ describe("when given a rule with descendant combinator", function () {
 
     const filename = "/src/routes/index.svelte";
 
-    const classCache = getProxiedObject();
-    const declarationCache = getProxiedObject();
-
-    const tokenizer = createTokenizer(classCache, declarationCache);
-    const ast = parse(code, { filename });
-    const parsedPath = path.parse(filename);
-    tokenizer.generateToken(ast.css, parsedPath);
-
-    const transformer = createTransformer(code, parsedPath)
-      .transformHtml(ast.html, classCache)
-      .transformCss(ast.css, declarationCache);
-
-    const result = transformer.toString();
+    const result = wrappedPreprocessor(code, filename).code;
 
     expect(result.replace(/\s/g, "")).toBe(
       `<style>
@@ -96,6 +91,60 @@ describe("when given a rule with descendant combinator", function () {
       </style>
       <main class="main">
           <h1 class="a"></h1>
+      </main>
+`.replace(/\s/g, "")
+    );
+  });
+});
+
+describe("when given a rule with child combinator", function () {
+  it("should add class to its direct child HTML tag", function () {
+    const code = `
+<style>
+.main>.h1{
+  color: #ff3e00;
+}
+</style><main class="main"><h1 class="h1"></h1></main>`;
+
+    const filename = "/src/routes/index.svelte";
+
+    const result = wrappedPreprocessor(code, filename).code;
+
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+        :global(.a){
+          color: #ff3e00;
+        }
+      </style>
+      <main class="main">
+          <h1 class="a"></h1>
+      </main>
+`.replace(/\s/g, "")
+    );
+  });
+
+  it("should not add class to other HTML tag", function () {
+    const code = `
+<style>
+.main>.h1{
+  color: #ff3e00;
+}
+</style><main class="main"><div><h1 class="h1"></h1></div></main>`;
+
+    const filename = "/src/routes/index.svelte";
+
+    const result = wrappedPreprocessor(code, filename).code;
+
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+        :global(.a){
+          color: #ff3e00;
+        }
+      </style>
+      <main class="main">
+          <div>
+          <h1 class="h1"></h1>
+          </div>
       </main>
 `.replace(/\s/g, "")
     );
@@ -113,19 +162,7 @@ color: #ff3e00;
 
     const filename = "/src/routes/index.svelte";
 
-    const classCache = getProxiedObject();
-    const declarationCache = getProxiedObject();
-
-    const tokenizer = createTokenizer(classCache, declarationCache);
-    const ast = parse(code, { filename });
-    const parsedPath = path.parse(filename);
-    tokenizer.generateToken(ast.css, parsedPath);
-
-    const transformer = createTransformer(code, parsedPath)
-      .transformHtml(ast.html, classCache)
-      .transformCss(ast.css, declarationCache);
-
-    const result = transformer.toString();
+    const result = wrappedPreprocessor(code, filename).code;
 
     expect(result.replace(/\s/g, "")).toBe(
       `<style>
