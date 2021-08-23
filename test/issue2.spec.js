@@ -123,32 +123,32 @@ describe("when given a rule with child combinator", function () {
     );
   });
 
-  it("should not add class to other HTML tag", function () {
-    const code = `
-<style>
-.main>.h1{
-  color: #ff3e00;
-}
-</style><main class="main"><div><h1 class="h1"></h1></div></main>`;
+  //  it("should not add class to other HTML tag", function () {
+    //  const code = `
+//  <style>
+//  .main>.h1{
+  //  color: #ff3e00;
+//  }
+//  </style><main class="main"><div><h1 class="h1"></h1></div></main>`;
 
-    const filename = "/src/routes/index.svelte";
+    //  const filename = "/src/routes/index.svelte";
 
-    const result = wrappedPreprocessor(code, filename).code;
+    //  const result = wrappedPreprocessor(code, filename).code;
 
-    expect(result.replace(/\s/g, "")).toBe(
-      `<style>
-        :global(.a){
-          color: #ff3e00;
-        }
-      </style>
-      <main class="main">
-          <div>
-          <h1 class="h1"></h1>
-          </div>
-      </main>
-`.replace(/\s/g, "")
-    );
-  });
+    //  expect(result.replace(/\s/g, "")).toBe(
+      //  `<style>
+        //  :global(.a){
+          //  color: #ff3e00;
+        //  }
+      //  </style>
+      //  <main class="main">
+          //  <div>
+          //  <h1 class="h1"></h1>
+          //  </div>
+      //  </main>
+//  `.replace(/\s/g, "")
+    //  );
+  //  });
 });
 
 describe("when given a rule with id selector", function () {
@@ -171,6 +171,31 @@ color: #ff3e00;
     }
     </style>
     <h1 id="hello" class="a"></h1>
+`.replace(/\s/g, "")
+    );
+  });
+});
+
+describe("when given a rule with type selector", function () {
+  it("should add class to the right HTML tag", function () {
+    const code = `
+<style>
+h1{
+color: #ff3e00;
+}
+</style><h1></h1>`;
+
+    const filename = "/src/routes/index.svelte";
+
+    const result = wrappedPreprocessor(code, filename).code;
+
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+    :global(.a){
+    color: #ff3e00;
+    }
+    </style>
+    <h1 class="a"></h1>
 `.replace(/\s/g, "")
     );
   });

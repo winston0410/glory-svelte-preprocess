@@ -1,5 +1,3 @@
-import { walk } from "svelte/compiler";
-
 export const getAttribute = (elem, name) =>
   elem?.attributes.find((attr) => attr.name === name);
 
@@ -7,10 +5,11 @@ export const getInjectionSlot = (elem) => {
   let start, end
   let append = false
   
-  //  if (elem.attributes.length < 1) {
-    //  //  TODO:
-    //  return;
-  //  }
+  if (elem.attributes.length < 1) {
+    append = true
+    end = elem.start + elem.name.length + 1
+    return [append, start, end]
+  }
   const classAttr = getAttribute(elem, "class");
   if (classAttr) {
     const classAttrValue = classAttr.value[0];
@@ -68,7 +67,6 @@ export const getClassName = (rule) => {
         break;
 
       case "TypeSelector":
-        shouldMinify = false;
         className += `${selectorNode.name}`;
         break;
 
