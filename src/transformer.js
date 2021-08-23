@@ -6,6 +6,7 @@ import {
   matchWithSelector,
   getMinifiedToken,
   getAttribute,
+  getInjectionSlot,
   createGenerator,
   isCombinator,
 } from "./helper.js";
@@ -22,18 +23,18 @@ const isTargetElement = (selectorNode, node, linker) => {
 
   while (r.getIndex() > -1) {
     if (!curNode) {
-        linker.reveal()
-        return false
+      linker.reveal();
+      return false;
     }
     //  console.log("run count", index, selector, curNode);
-    const combinator = isCombinator(selector)
+    const combinator = isCombinator(selector);
     if (combinator) {
       curNode = linker.getParent(curNode);
       selector = r.prev();
       if (combinator === ">") {
-          //  prevent linker from providing more than one node for finding direct parent
-          linker.hide(curNode)
-      } 
+        //  prevent linker from providing more than one node for finding direct parent
+        linker.hide(curNode);
+      }
     } else {
       const isMatch = matchWithSelector(curNode, selector);
       if (isMatch) {
@@ -112,8 +113,12 @@ export default function (code, { dir, base }) {
 
             if (result) {
               const minified = getMinifiedToken(replaceList.get(selectorNode));
-              const slot = getAttribute(node, "class").value[0];
-              changeable.overwrite(slot.start, slot.end, minified);
+              const [append, start, end] = getInjectionSlot(node);
+              if (append) {
+                changeable.appendRight(end, `class="${minified}"`)
+              } else {
+                changeable.overwrite(start, end, minified);
+              }
             }
           }
         },

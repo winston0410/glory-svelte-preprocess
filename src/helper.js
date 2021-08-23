@@ -4,22 +4,25 @@ export const getAttribute = (elem, name) =>
   elem?.attributes.find((attr) => attr.name === name);
 
 export const getInjectionSlot = (elem) => {
-  let start, end;
-  if (elem.attributes.length < 1) {
-    //  TODO:
-    return;
-  }
+  let start, end
+  let append = false
+  
+  //  if (elem.attributes.length < 1) {
+    //  //  TODO:
+    //  return;
+  //  }
   const classAttr = getAttribute(elem, "class");
   if (classAttr) {
     const classAttrValue = classAttr.value[0];
     start = classAttrValue.start;
     end = classAttrValue.end;
   } else {
-    //  TODO: find the last attribute
-    //  const lastAttr = elem.attributes[
+    const lastAttr = elem.attributes[elem.attributes.length - 1].value[0]
+    end = lastAttr.end + 1
+    append = true
   }
 
-  return [start, end];
+  return [append, start, end];
 };
 
 export const getMediaQuery = (rule) => {
@@ -70,7 +73,6 @@ export const getClassName = (rule) => {
         break;
 
       case "IdSelector":
-        shouldMinify = false;
         className += `#${selectorNode.name}`;
         break;
 

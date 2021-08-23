@@ -65,13 +65,6 @@ describe("when given a rule with descendant combinator", function () {
 
 describe("when given a rule with descendant combinator", function () {
   it("should add class to the right HTML tag", function () {
-    //  const code = `
-    //  <style>
-    //  .main .h1 {
-    //  color: #ff3e00;
-    //  }
-    //  </style><main class="main"><h1 id="hello" class="h1"></h1></main>`;
-
     const code = `
 <style>
 .main .h1{
@@ -89,16 +82,15 @@ describe("when given a rule with descendant combinator", function () {
     const parsedPath = path.parse(filename);
     tokenizer.generateToken(ast.css, parsedPath);
 
-    const transformer = createTransformer(code, parsedPath).transformHtml(
-      ast.html,
-      classCache
-    );
+    const transformer = createTransformer(code, parsedPath)
+      .transformHtml(ast.html, classCache)
+      .transformCss(ast.css, declarationCache);
 
     const result = transformer.toString();
 
     expect(result.replace(/\s/g, "")).toBe(
       `<style>
-        .main .h1 {
+        :global(.a){
           color: #ff3e00;
         }
       </style>
@@ -110,42 +102,39 @@ describe("when given a rule with descendant combinator", function () {
   });
 });
 
-//  describe("when given a rule with id selector", function () {
-//  it("should add class to the right HTML tag", function () {
-//  const code = `
-//  <style>
-//  #hello{
-//  color: #ff3e00;
-//  }
-//  </style><h1 id="hello"></h1>`;
+describe("when given a rule with id selector", function () {
+  it("should add class to the right HTML tag", function () {
+    const code = `
+<style>
+#hello{
+color: #ff3e00;
+}
+</style><h1 id="hello"></h1>`;
 
-//  const filename = "/src/routes/index.svelte";
+    const filename = "/src/routes/index.svelte";
 
-//  const classCache = getProxiedObject();
-//  const declarationCache = getProxiedObject();
+    const classCache = getProxiedObject();
+    const declarationCache = getProxiedObject();
 
-//  const tokenizer = createTokenizer(classCache, declarationCache);
-//  const ast = parse(code, { filename });
-//  const parsedPath = path.parse(filename);
-//  tokenizer.generateToken(ast.css, parsedPath);
+    const tokenizer = createTokenizer(classCache, declarationCache);
+    const ast = parse(code, { filename });
+    const parsedPath = path.parse(filename);
+    tokenizer.generateToken(ast.css, parsedPath);
 
-//  const transformer = createTransformer(code, parsedPath).transformHtml(
-//  ast.html,
-//  classCache
-//  )
+    const transformer = createTransformer(code, parsedPath)
+      .transformHtml(ast.html, classCache)
+      .transformCss(ast.css, declarationCache);
 
-//  const result = transformer.toString();
+    const result = transformer.toString();
 
-//  expect(result.replace(/\s/g, "")).toBe(
-//  `<style>
-//  a{
-//  color: #ff3e00;
-//  }
-//  </style>
-//  <main>
-//  <h1 class="a"></h1>
-//  </main>
-//  `.replace(/\s/g, "")
-//  );
-//  });
-//  });
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+    :global(.a){
+    color: #ff3e00;
+    }
+    </style>
+    <h1 id="hello" class="a"></h1>
+`.replace(/\s/g, "")
+    );
+  });
+});
