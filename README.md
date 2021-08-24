@@ -1,6 +1,10 @@
 # glory-svelte-preprocess
 
-A svelte preprocess for safely minimizing CSS class footprint for unbeliveable performance gain. :rocket: :rocket: :rocket:
+A svelte preprocess minimize CSS class footprint with statical analysis for unbeliveable performance gain. :rocket: :rocket: :rocket:
+
+## Disclaimers
+
+Although this preprocess has been tested extensively, this is not stable yet and expect a bug or two given the complexity of the whole process. Do open an issue and let me know if something go south, and I will try to fix as fast as I can.
 
 ## tldr;
 

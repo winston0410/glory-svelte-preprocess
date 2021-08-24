@@ -41,7 +41,6 @@ const isTargetElement = (selectorNode, node, linker) => {
       }
     } else {
       const isMatch = matchWithSelector(curNode, selector);
-      console.log(combinator, isMatch, curNode, selector);
       if (isMatch) {
         selector = r.prev();
         matchCount++;

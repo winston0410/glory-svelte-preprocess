@@ -210,27 +210,32 @@ export const matchWithSelector = (element, selector) => {
     case "AttributeSelector": {
       const attr = getAttribute(element, selector.name.name);
       const attrValue = attr.value[0];
+      const unquoted = selector.value.value.replace(/(^["']|["']$)/g, "");
       switch (selector.matcher) {
         case "=": {
-          return (
-            attrValue.raw === selector.value.value.replace(/(^["']|["']$)/g, "")
-          );
+          return attrValue.raw === unquoted;
         }
 
-        //  TODO: Unhandled
+        //  TODO: Fix as it will match hyphen as well
         case "~=": {
+          return new RegExp(`\\b${unquoted}\\b`).test(attrValue.raw)
         }
 
+        //  TODO: Fix as it will match hyphen as well
         case "|=": {
+          return new RegExp(`\\b${unquoted}\\b`).test(attrValue.raw)
         }
 
         case "^=": {
+          return attrValue.raw.startsWith(unquoted);
         }
 
         case "$=": {
+          return attrValue.raw.endsWith(unquoted);
         }
 
         case "*=": {
+          return attrValue.raw.includes(unquoted);
         }
 
         default: {

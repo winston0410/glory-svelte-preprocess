@@ -249,33 +249,6 @@ describe("when given a rule with pseudo element", function () {
   });
 });
 
-describe("when given a rule with attribute selector", function () {
-  it("should add class to the correct tag", function () {
-    const code = `
-<style>
-[href="https://example.org"]{
-  color: #ff3e00;
-}
-</style><div><a href="https://example.org"></a></div>`;
-
-    const filename = "/src/routes/index.svelte";
-
-    const result = wrappedPreprocessor(code, filename).code;
-
-    expect(result.replace(/\s/g, "")).toBe(
-      `<style>
-        :global(.a){
-          color: #ff3e00;
-        }
-      </style>
-      <div>
-          <a href="https://example.org" class="a"></a>
-      </div>
-`.replace(/\s/g, "")
-    );
-  });
-});
-
 describe("when given a rule with :not pseudo selector", function () {
   it("should transform the html correctly", function () {
     const code = `
