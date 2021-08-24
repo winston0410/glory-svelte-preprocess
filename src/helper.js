@@ -216,14 +216,16 @@ export const matchWithSelector = (element, selector) => {
           return attrValue.raw === unquoted;
         }
 
-        //  TODO: Fix as it will match hyphen as well
         case "~=": {
-          return new RegExp(`\\b${unquoted}\\b`).test(attrValue.raw)
+          return new RegExp(`(?<=\\s)${unquoted}`).test(
+            attrValue.raw
+          ) || unquoted === attrValue.raw
         }
 
-        //  TODO: Fix as it will match hyphen as well
         case "|=": {
-          return new RegExp(`\\b${unquoted}\\b`).test(attrValue.raw)
+          return new RegExp(`(?<=-)${unquoted}`).test(
+            attrValue.raw
+          ) || unquoted === attrValue.raw
         }
 
         case "^=": {
