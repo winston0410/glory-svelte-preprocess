@@ -75,7 +75,6 @@ export const getClassName = (rule) => {
         break;
 
       case "AttributeSelector":
-        shouldMinify = false;
         className += `[${selectorNode.name.name}${selectorNode.matcher}${selectorNode.value.value}]`;
         break;
 
@@ -140,7 +139,9 @@ export const assembleRules = (cache) => {
   for (const mediaQuery in cache) {
     for (const pseudo in cache[mediaQuery]) {
       for (const property in cache[mediaQuery][pseudo]) {
-        const className = cache[mediaQuery][pseudo][property] + (pseudo !== "none" ? pseudo : "");
+        const className =
+          cache[mediaQuery][pseudo][property] +
+          (pseudo !== "none" ? pseudo : "");
         let rule = `:global(.${className}){${property}}`;
         if (mediaQuery !== "none") {
           rule = `${mediaQuery}{${rule}}`;
@@ -183,7 +184,8 @@ export const matchWithSelector = (element, selector) => {
       return true;
     }
     case "PseudoClassSelector": {
-      return true;
+      //  Not handle :not at the moment
+      return selector.name !== "not";
     }
   }
 
@@ -200,6 +202,37 @@ export const matchWithSelector = (element, selector) => {
         }
       }
       return false;
+    }
+    case "AttributeSelector": {
+      const attr = getAttribute(element, selector.name.name);
+      const attrValue = attr.value[0];
+      switch (selector.matcher) {
+        case "=": {
+          return (
+            attrValue.raw === selector.value.value.replace(/(^["']|["']$)/g, "")
+          );
+        }
+
+        //  TODO: Unhandled
+        case "~=": {
+        }
+
+        case "|=": {
+        }
+
+        case "^=": {
+        }
+
+        case "$=": {
+        }
+
+        case "*=": {
+        }
+
+        default: {
+          return false;
+        }
+      }
     }
     case "IdSelector": {
       const attr = getAttribute(element, "id");
