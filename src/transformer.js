@@ -32,25 +32,59 @@ const isTargetElement = (selectorNode, node, linker) => {
     }
     const combinator = isCombinator(selector);
     if (combinator) {
-      curNode = linker.getParent(curNode);
       selector = r.prev();
       matchCount++;
-      if (combinator === ">") {
-        //  prevent linker from providing more than one node for finding direct parent
-        linker.hide(curNode);
+      switch (combinator) {
+        case ">":
+          //  prevent linker from providing more than one node for finding direct parent
+          curNode = linker.getParent(curNode);
+          linker.hide(curNode);
+          break;
+
+        case "~": {
+          //  should check its siblings before it
+          const parent = linker.getParent(curNode);
+          const curNodeIndex = parent.children.findIndex((s) => s === curNode);
+          const sliced = parent.children.slice(0, curNodeIndex + 1);
+
+          for (const sibling of sliced) {
+            const matched = matchWithSelector(sibling, selector);
+            if (matched) {
+              matchCount++;
+            }
+          }
+          break;
+        }
+
+        case "+": {
+          const parent = linker.getParent(curNode);
+          const curNodeIndex = parent.children.findIndex((s) => s === curNode);
+          if (curNodeIndex > 0) {
+            curNode = parent.children[curNodeIndex - 1];
+          } else {
+            return false;
+          }
+          break;
+        }
+
+        case " ": {
+          curNode = linker.getParent(curNode);
+          break;
+        }
       }
     } else {
       const isMatch = matchWithSelector(curNode, selector);
       if (isMatch) {
         selector = r.prev();
         matchCount++;
-        if (r.length() === matchCount) {
-          found = true;
-          return found;
-        }
       } else {
         return false;
       }
+    }
+
+    if (r.length() === matchCount) {
+      found = true;
+      return found;
     }
   }
 

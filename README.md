@@ -98,25 +98,27 @@ And Svelte will generate the following HTML and CSS(should be external styleshee
 
 This preprocess will transform rules with the following selectors:
 
-[X] Type Selector `h1`
+- [X] Type Selector `h1`
 
-[X] Id Selector `#foo`
+- [X] Id Selector `#foo`
 
-[X] Class Selector `.foo`
+- [X] Class Selector `.foo`
 
-[X] Attribute Selector `li[title]`
+- [X] Attribute Selector `li[title]`
 
-[X] Descendant combinator `.foo .bar` 
+- [X] Descendant combinator `.foo .bar` 
 
-[X] Child combinator `.foo>.bar` 
+- [X] Child combinator `.foo>.bar` 
 
-[ ] Adjacent sibling combinator `.foo+.bar` 
+- [X] Adjacent sibling combinator `.foo+.bar` 
 
-[ ] General sibling combinator `.foo~.bar` 
+- [X] General sibling combinator `.foo~.bar` 
 
-[X] Pseudo class `.foo:hover` 
+- [X] Pseudo class `.foo:hover` 
 
-[X] Pseudo selector `.foo::before` 
+- [X] Pseudo selector `.foo::before` 
+
+- [X] `:not()` selector `a:not(.hello)`
 
 ## Known limitations
 
