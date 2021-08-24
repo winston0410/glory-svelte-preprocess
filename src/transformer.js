@@ -138,6 +138,7 @@ export default function (code, { dir, base }) {
     transformHtml(ast, cache) {
       const replaceList = cache[dir][base];
       const linker = createLinker();
+      const postponed = new Map();
 
       walk(ast, {
         enter(node, parent) {
@@ -151,17 +152,32 @@ export default function (code, { dir, base }) {
             const result = isTargetElement(selectorNode, node, linker);
 
             if (result) {
-              const minified = getMinifiedToken(replaceList.get(selectorNode));
               const [append, start, end] = getInjectionSlot(node);
               if (append) {
-                changeable.appendRight(end, `class="${minified}"`);
+                const classList = postponed.get(end);
+                const newClassList = replaceList.get(selectorNode);
+                if (!classList) {
+                  postponed.set(end, newClassList);
+                } else {
+                  postponed.set(end, Object.assign(classList, newClassList));
+                }
               } else {
+                //  TODO: Fix double overwrite
+                const minified = getMinifiedToken(
+                  replaceList.get(selectorNode)
+                );
                 changeable.overwrite(start, end, minified);
               }
             }
           }
         },
       });
+
+      //  Only write className once only
+      for (const [end, classList] of postponed) {
+        const minified = getMinifiedToken(classList)
+        changeable.appendRight(end, ` class="${minified}"`);
+      }
 
       return this;
     },

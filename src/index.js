@@ -27,6 +27,7 @@ export default function (opts = {}) {
 
         const transformer = createTransformer(content, parsedPath);
 
+        //  TODO: hoisted is not providing all declarations
         const hoisted = hoistDeclaration(
           opts,
           parsedPath,
@@ -36,7 +37,7 @@ export default function (opts = {}) {
 
         const result = transformer
           .transformHtml(ast.html, classCache)
-          .transformCss(ast.css, hoisted)
+          .transformCss(ast.css, declarationCache)
           .toString();
 
         return {
