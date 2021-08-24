@@ -3,7 +3,7 @@ import createTokenizer from "../src/tokenizer";
 import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
 import path from "path";
-import wrappedPreprocessor from './wrapper.js'
+import wrappedPreprocessor from "./wrapper.js";
 
 describe("when given a rule with descendant combinator", function () {
   const code = `
@@ -271,6 +271,30 @@ describe("when given a rule with attribute selector", function () {
       <div>
           <a href="https://example.org" class="a"></a>
       </div>
+`.replace(/\s/g, "")
+    );
+  });
+});
+
+describe("when given a rule with :not pseudo selector", function () {
+  it("should transform the html correctly", function () {
+    const code = `
+<style>
+:not(.hello){
+  color: #ff3e00;
+}
+</style><p></p><p class="world"></p>`;
+
+    const filename = "/src/routes/index.svelte";
+
+    const result = wrappedPreprocessor(code, filename).code;
+
+    expect(result.replace(/\s/g, "")).toBe(
+      `<style>
+        :global(.a){
+          color: #ff3e00;
+        }
+      </style><p class="a"></p><p class="a"></p>
 `.replace(/\s/g, "")
     );
   });

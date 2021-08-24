@@ -34,23 +34,23 @@ const isTargetElement = (selectorNode, node, linker) => {
     if (combinator) {
       curNode = linker.getParent(curNode);
       selector = r.prev();
-      matchCount ++
+      matchCount++;
       if (combinator === ">") {
         //  prevent linker from providing more than one node for finding direct parent
         linker.hide(curNode);
       }
     } else {
       const isMatch = matchWithSelector(curNode, selector);
-      console.log(isMatch, curNode, selector)
+      console.log(combinator, isMatch, curNode, selector);
       if (isMatch) {
         selector = r.prev();
         matchCount++;
         if (r.length() === matchCount) {
           found = true;
-          return found
+          return found;
         }
       } else {
-        curNode = linker.getParent(curNode);
+        return false;
       }
     }
   }

@@ -120,8 +120,6 @@ This preprocess currently doesn't handle the following selectors:
 
 - multiple pseudo selectors (e.g. `.foo:active .bar:hover`)
 
-- `:not` pseudo class
-
 ## FAQ
 
 ### No hash for classname?

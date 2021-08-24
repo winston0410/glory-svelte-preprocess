@@ -139,10 +139,10 @@ export const assembleRules = (cache) => {
   for (const mediaQuery in cache) {
     for (const pseudo in cache[mediaQuery]) {
       for (const property in cache[mediaQuery][pseudo]) {
-        const className =
-          cache[mediaQuery][pseudo][property] +
-          (pseudo !== "none" ? pseudo : "");
-        let rule = `:global(.${className}){${property}}`;
+        const className = cache[mediaQuery][pseudo][property];
+        let rule = `:global(.${className}${
+          pseudo === "none" || pseudo === ":not" ? "" : pseudo
+        }){${property}}`;
         if (mediaQuery !== "none") {
           rule = `${mediaQuery}{${rule}}`;
         }
@@ -185,7 +185,11 @@ export const matchWithSelector = (element, selector) => {
     }
     case "PseudoClassSelector": {
       //  Not handle :not at the moment
-      return selector.name !== "not";
+      if (selector.name === "not") {
+        return !matchWithSelector(element, selector.children[0].children[0]);
+      } else {
+        return true;
+      }
     }
   }
 
