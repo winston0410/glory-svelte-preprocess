@@ -2,7 +2,7 @@ export const getAttribute = (elem, name) =>
   elem.attributes?.find((attr) => attr.name === name);
 
 export const getInjectionSlot = (elem) => {
-  let append = false
+  let append = false;
   let start, end;
   const classAttr = getAttribute(elem, "class");
   if (classAttr) {
@@ -10,11 +10,11 @@ export const getInjectionSlot = (elem) => {
     start = classAttrValue.start;
     end = classAttrValue.end;
   } else {
-    append = true
+    append = true;
     end = elem.start + elem.name.length + 1;
   }
 
-  return [append,start, end];
+  return [append, start, end];
 };
 
 export const getMediaQuery = (rule) => {
@@ -43,47 +43,21 @@ export const getMediaQuery = (rule) => {
 export const getSelectorNode = (rule) => rule.prelude.children[0];
 
 export const getClassName = (rule) => {
-  let className = "";
   let shouldMinify = true;
   for (const selectorNode of getSelectorNode(rule).children) {
     switch (selectorNode.type) {
-      case "ClassSelector":
-        className += `.${selectorNode.name}`;
-        break;
-
-      case "PseudoElementSelector":
-        className += `::${selectorNode.name}`;
-        break;
-
       case "PseudoClassSelector":
-        className += `:${selectorNode.name}`;
-        break;
-
-      case "TypeSelector":
-        className += `${selectorNode.name}`;
-        break;
-
-      case "IdSelector":
-        className += `#${selectorNode.name}`;
-        break;
-
-      case "AttributeSelector":
-        className += `[${selectorNode.name.name}${selectorNode.matcher}${selectorNode.value.value}]`;
-        break;
-
-      case "WhiteSpace":
-        className += selectorNode.value;
-        break;
-
-      case "Combinator":
-        className += selectorNode.name;
+          //  Ignore global as the value in compiler is not correct right now
+          if (selectorNode.name === "global") {
+              return false
+          }
         break;
 
       default:
         break;
     }
   }
-  return [className, shouldMinify];
+  return shouldMinify;
 };
 
 const stringifyDeclarationNode = (node) => {
@@ -120,7 +94,7 @@ const stringifyDeclarationNode = (node) => {
 
 export const getDeclaration = (declarationNode) => {
   if (declarationNode.type === "Raw") {
-      return ""
+    return "";
   }
   let declaration = `${declarationNode.property}:`;
   for (const valueNode of declarationNode.value.children) {
@@ -137,7 +111,9 @@ export const assembleRules = (cache) => {
       for (const property in cache[mediaQuery][pseudo]) {
         const className = cache[mediaQuery][pseudo][property];
         let rule = `:global(.${className}${
-          pseudo === "none" || pseudo === ":not" ? "" : pseudo
+          pseudo === "none" || pseudo === ":not" || pseudo === ":global"
+            ? ""
+            : pseudo
         }){${property}}`;
         if (mediaQuery !== "none") {
           rule = `${mediaQuery}{${rule}}`;
@@ -183,6 +159,9 @@ export const matchWithSelector = (element, selector) => {
       //  Not handle :not at the moment
       if (selector.name === "not") {
         return !matchWithSelector(element, selector.children[0].children[0]);
+      } else if (selector.name === "global") {
+        //  TODO: Cannot be handled as the value of selector is Raw now
+        return false
       } else {
         return true;
       }
@@ -193,7 +172,7 @@ export const matchWithSelector = (element, selector) => {
     case "ClassSelector": {
       const attr = getAttribute(element, "class");
       if (!attr) {
-          return false
+        return false;
       }
       for (const className of attr.value[0].raw.split(" ")) {
         if (className === selector.name) {
@@ -205,7 +184,7 @@ export const matchWithSelector = (element, selector) => {
     case "AttributeSelector": {
       const attr = getAttribute(element, selector.name.name);
       if (!attr) {
-          return false
+        return false;
       }
       const attrValue = attr.value[0];
       const unquoted = selector.value.value.replace(/(^["']|["']$)/g, "");
@@ -248,7 +227,7 @@ export const matchWithSelector = (element, selector) => {
     case "IdSelector": {
       const attr = getAttribute(element, "id");
       if (!attr) {
-          return false
+        return false;
       }
       if (attr.value[0].raw === selector.name) {
         return true;

@@ -48,7 +48,7 @@ const hydrateClassCache = (
   next,
   mediaQueryName
 ) => {
-  const [, shouldMinify] = getClassName(rule);
+  const shouldMinify = getClassName(rule);
   if (shouldMinify) {
     const selector = getSelectorNode(rule);
     const pseudo = getPseudoSelector(selector);

@@ -106,7 +106,7 @@ export default function (code, { dir, base }) {
             case "Style": {
               for (const child of node.children) {
                 if (child.type === "Rule") {
-                  if (getClassName(child)[0]) {
+                  if (getClassName(child)) {
                     changeable.overwrite(child.start, child.end, "");
                   }
                 }

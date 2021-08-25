@@ -135,25 +135,3 @@ describe("when given a declaration that uses string as its value", function () {
     });
   });
 });
-
-describe("when given a rule that uses child combinator in selector", function () {
-  const code = `<style>
-  .hello>.world{
-    font-size: 20px;
-  }
-</style>`;
-
-  const ast = parse(code, { filename: "" });
-
-  it("should generate the selector correctly", function () {
-    walk(ast.css, {
-      enter(node) {
-        if (node.type !== "Rule") {
-          return;
-        }
-        const [selector] = getClassName(node)
-        expect(selector).toBe(".hello>.world")
-      },
-    });
-  });
-});
