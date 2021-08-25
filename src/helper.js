@@ -162,7 +162,7 @@ export const getProxiedObject = () => {
 };
 
 export const matchWithSelector = (element, selector) => {
-  if (element.type === "Fragment" || element.type.endsWith("Block")) {
+  if (element.type !== "Element") {
     return false;
   }
 
@@ -186,13 +186,12 @@ export const matchWithSelector = (element, selector) => {
     }
   }
 
-  if (element.attributes.length < 1) {
-    return false;
-  }
-
   switch (selector.type) {
     case "ClassSelector": {
       const attr = getAttribute(element, "class");
+      if (!attr) {
+          return false
+      }
       for (const className of attr.value[0].raw.split(" ")) {
         if (className === selector.name) {
           return true;
@@ -202,6 +201,9 @@ export const matchWithSelector = (element, selector) => {
     }
     case "AttributeSelector": {
       const attr = getAttribute(element, selector.name.name);
+      if (!attr) {
+          return false
+      }
       const attrValue = attr.value[0];
       const unquoted = selector.value.value.replace(/(^["']|["']$)/g, "");
       switch (selector.matcher) {
@@ -242,6 +244,9 @@ export const matchWithSelector = (element, selector) => {
     }
     case "IdSelector": {
       const attr = getAttribute(element, "id");
+      if (!attr) {
+          return false
+      }
       if (attr.value[0].raw === selector.name) {
         return true;
       }
