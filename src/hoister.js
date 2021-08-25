@@ -45,16 +45,17 @@ export const hoistDeclaration = (
   classCache,
   declarationCache
 ) => {
+  const layoutFilename =  "__layout.svelte"
   if (!opts.lazyLoad) {
-    return removeComponentDecl(opts.layoutFilename, curBase, declarationCache);
+    return removeComponentDecl(layoutFilename, curBase, declarationCache);
   }
 
-  if (curBase === opts.layoutFilename) {
+  if (curBase === layoutFilename) {
     return declarationCache;
   }
 
   const currentComponentDecl = classCache[curDir][curBase];
-  const layoutDecl = findClosestLayout(curDir, opts.layoutFilename, classCache);
+  const layoutDecl = findClosestLayout(curDir, layoutFilename, classCache);
 
   //  hoisting won't work without a __layout.svelte
   if (!layoutDecl) {

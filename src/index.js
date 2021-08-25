@@ -12,7 +12,6 @@ let tokernizer = createTokenizer(classCache, declarationCache);
 
 const defaultOpts = {
   lazyLoad: true,
-  layoutFilename: "__layout.svelte",
 };
 
 export default function (opts = {}) {
@@ -27,7 +26,6 @@ export default function (opts = {}) {
 
         const transformer = createTransformer(content, parsedPath);
 
-        //  TODO: hoisted is not providing all declarations
         const hoisted = hoistDeclaration(
           opts,
           parsedPath,
