@@ -1,4 +1,9 @@
 import wrappedPreprocessor from "./wrapper.js";
+import { reset } from "../src/index.js"
+
+afterEach(() => {
+    reset()
+})
 
 describe("when svelte block is used in markup", function () {
   it("should not affect the preprocessor from running", function () {

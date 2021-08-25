@@ -2,6 +2,11 @@ import createTokenizer from "../src/tokenizer";
 import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
 import path from "path";
+import { reset } from "../src/index.js"
+
+afterEach(() => {
+    reset()
+})
 
 describe("when processing multiple components", function () {
   const classCache = getProxiedObject();

@@ -4,6 +4,11 @@ import { getProxiedObject } from "../src/helper";
 import { parse } from "svelte/compiler";
 import path from "path";
 import wrappedPreprocessor from "./wrapper.js";
+import { reset } from "../src/index.js"
+
+afterEach(() => {
+    reset()
+})
 
 describe("when given a rule with descendant combinator", function () {
   const code = `

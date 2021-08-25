@@ -1,6 +1,11 @@
 import createTransformer from "../src/transformer.js";
 import { parse } from "svelte/compiler";
 import path from "path";
+import { reset } from "../src/index.js"
+
+afterEach(() => {
+    reset()
+})
 
 describe("when transforming html", function () {
   const code = `

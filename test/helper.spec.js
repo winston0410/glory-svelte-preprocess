@@ -1,6 +1,11 @@
 import { getDeclaration, getClassName } from "../src/helper.js";
 import { parse } from "svelte/compiler";
 import { walk } from "svelte/compiler";
+import { reset } from "../src/index.js"
+
+afterEach(() => {
+    reset()
+})
 
 //  getDeclaration
 describe("when given a declaration with url() as value", () => {

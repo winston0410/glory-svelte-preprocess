@@ -1,4 +1,9 @@
 import wrappedPreprocessor from "./wrapper.js";
+import { reset } from "../src/index.js"
+
+afterEach(() => {
+    reset()
+})
 
 describe("when given a rule with general sibling combinator", function () {
   it("should add class to the correct tag", function () {

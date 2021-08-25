@@ -1,4 +1,9 @@
 import wrappedPreprocessor from "./wrapper.js";
+import { reset } from "../src/index.js"
+
+afterEach(() => {
+    reset()
+})
 
 describe("when given a rule with attribute selector", function () {
   describe("when given a matcher of =", function () {
