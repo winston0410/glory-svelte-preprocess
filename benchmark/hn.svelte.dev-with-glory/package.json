@@ -1,0 +1,19 @@
+{
+	"name": "hn.svelte.dev",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "svelte-kit dev",
+		"build": "svelte-kit build --verbose",
+		"preview": "svelte-kit preview"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-netlify": "next",
+		"@sveltejs/kit": "next",
+		"svelte": "^3.40.0"
+	},
+	"dependencies": {
+		"glory-svelte-preprocess": "^0.2.0"
+	}
+}
