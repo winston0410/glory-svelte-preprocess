@@ -119,6 +119,9 @@ const stringifyDeclarationNode = (node) => {
 };
 
 export const getDeclaration = (declarationNode) => {
+  if (declarationNode.type === "Raw") {
+      return ""
+  }
   let declaration = `${declarationNode.property}:`;
   for (const valueNode of declarationNode.value.children) {
     declaration += stringifyDeclarationNode(valueNode);
