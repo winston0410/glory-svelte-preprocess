@@ -43,21 +43,31 @@ export const getMediaQuery = (rule) => {
 export const getSelectorNode = (rule) => rule.prelude.children[0];
 
 export const getClassName = (rule) => {
-  let shouldMinify = true;
+  //  This preprocess doesn't handle selectors with multiple pseudo selectors right now
+  let pseudoCount = 0;
   for (const selectorNode of getSelectorNode(rule).children) {
+    if (pseudoCount > 1) {
+      return false;
+    }
     switch (selectorNode.type) {
+      case "PseudoElementSelector":
+        pseudoCount++;
+        break;
       case "PseudoClassSelector":
-          //  Ignore global as the value in compiler is not correct right now
-          if (selectorNode.name === "global") {
-              return false
-          }
+        //  Ignore global as the value in compiler is not correct right now
+        if (selectorNode.name === "global") {
+          return false;
+        }
+        if (selectorNode.name !== "not") {
+          pseudoCount++;
+        }
         break;
 
       default:
         break;
     }
   }
-  return shouldMinify;
+  return true;
 };
 
 const stringifyDeclarationNode = (node) => {
@@ -161,7 +171,7 @@ export const matchWithSelector = (element, selector) => {
         return !matchWithSelector(element, selector.children[0].children[0]);
       } else if (selector.name === "global") {
         //  TODO: Cannot be handled as the value of selector is Raw now
-        return false
+        return false;
       } else {
         return true;
       }
