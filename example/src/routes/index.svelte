@@ -11,6 +11,10 @@
         font-size: 12px;
     }
 
+    .hello{
+        font-weight: 700;
+    }
+
     @media (min-width: 30em) and (max-width: 80em)  {
         .hello{
            font-size: 100px;
