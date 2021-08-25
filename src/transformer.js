@@ -11,16 +11,6 @@ import {
 } from "./helper.js";
 import createLinker from "./linker.js";
 
-const injectCache = (cache, node, selectorNode) => {
-  const classList = cache.get(node);
-  const newClassList = replaceList.get(selectorNode);
-  if (!classList) {
-    cache.set(end, newClassList);
-  } else {
-    cache.set(end, Object.assign(classList, newClassList));
-  }
-};
-
 const isTargetElement = (selectorNode, node, linker) => {
   let found = false;
   let matchCount = 0;

@@ -162,7 +162,7 @@ export const getProxiedObject = () => {
 };
 
 export const matchWithSelector = (element, selector) => {
-  if (element.type === "Fragment") {
+  if (element.type === "Fragment" || element.type.endsWith("Block")) {
     return false;
   }
 
