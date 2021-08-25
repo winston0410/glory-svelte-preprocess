@@ -21,7 +21,7 @@ describe("when given a rule with attribute selector", function () {
         }
       </style>
       <div>
-          <a href="https://example.org" class="a"></a>
+          <a class="a" href="https://example.org"></a>
       </div>
 `.replace(/\s/g, "")
       );
@@ -50,7 +50,7 @@ describe("when given a rule with attribute selector", function () {
         }
       </style>
       <div>
-            <div><img title="hello world" class="a" /></div>
+            <div><img class="a" title="hello world"/></div>
       </div>
 `.replace(/\s/g, "")
       );
@@ -79,8 +79,8 @@ describe("when given a rule with attribute selector", function () {
         }
       </style>
       <div>
-          <a href="https://example.org" class="a"></a>
-          <a href="http://hello.org" class="a"></a>
+          <a class="a" href="https://example.org"></a>
+          <a class="a" href="http://hello.org"></a>
       </div>
 `.replace(/\s/g, "")
       );
@@ -109,7 +109,7 @@ describe("when given a rule with attribute selector", function () {
         }
       </style>
       <div>
-            <img title="hellobarworld" class="a"/>
+            <img class="a" title="hellobarworld"/>
       </div>
 `.replace(/\s/g, "")
       );
@@ -138,7 +138,7 @@ describe("when given a rule with attribute selector", function () {
         }
       </style>
       <div>
-            <img title="hello bar world" class="a"/>
+            <img class="a" title="hello bar world"/>
       </div>
 `.replace(/\s/g, "")
       );
@@ -167,7 +167,7 @@ describe("when given a rule with attribute selector", function () {
         }
       </style>
       <div>
-            <img title="foo-friend-bar" class="a"/>
+            <img class="a" title="foo-friend-bar"/>
       </div>
 `.replace(/\s/g, "")
       );
