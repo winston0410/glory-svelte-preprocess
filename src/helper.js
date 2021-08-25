@@ -1,27 +1,20 @@
 export const getAttribute = (elem, name) =>
-  elem?.attributes.find((attr) => attr.name === name);
+  elem.attributes?.find((attr) => attr.name === name);
 
 export const getInjectionSlot = (elem) => {
+  let append = false
   let start, end;
-  let append = false;
-
-  if (elem.attributes.length < 1) {
-    append = true;
-    end = elem.start + elem.name.length + 1;
-    return [append, start, end];
-  }
   const classAttr = getAttribute(elem, "class");
   if (classAttr) {
     const classAttrValue = classAttr.value[0];
     start = classAttrValue.start;
     end = classAttrValue.end;
   } else {
-    const lastAttr = elem.attributes[elem.attributes.length - 1].value[0];
-    end = lastAttr.end + 1;
-    append = true;
+    append = true
+    end = elem.start + elem.name.length + 1;
   }
 
-  return [append, start, end];
+  return [append,start, end];
 };
 
 export const getMediaQuery = (rule) => {
@@ -217,15 +210,17 @@ export const matchWithSelector = (element, selector) => {
         }
 
         case "~=": {
-          return new RegExp(`(?<=\\s)${unquoted}`).test(
-            attrValue.raw
-          ) || unquoted === attrValue.raw
+          return (
+            new RegExp(`(?<=\\s)${unquoted}`).test(attrValue.raw) ||
+            unquoted === attrValue.raw
+          );
         }
 
         case "|=": {
-          return new RegExp(`(?<=-)${unquoted}`).test(
-            attrValue.raw
-          ) || unquoted === attrValue.raw
+          return (
+            new RegExp(`(?<=-)${unquoted}`).test(attrValue.raw) ||
+            unquoted === attrValue.raw
+          );
         }
 
         case "^=": {

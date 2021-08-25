@@ -11,6 +11,16 @@ import {
 } from "./helper.js";
 import createLinker from "./linker.js";
 
+const injectCache = (cache, node, selectorNode) => {
+  const classList = cache.get(node);
+  const newClassList = replaceList.get(selectorNode);
+  if (!classList) {
+    cache.set(end, newClassList);
+  } else {
+    cache.set(end, Object.assign(classList, newClassList));
+  }
+};
+
 const isTargetElement = (selectorNode, node, linker) => {
   let found = false;
   let matchCount = 0;
@@ -138,7 +148,7 @@ export default function (code, { dir, base }) {
     transformHtml(ast, cache) {
       const replaceList = cache[dir][base];
       const linker = createLinker();
-      const postponed = new Map();
+      const overwriteCache = new Map();
 
       walk(ast, {
         enter(node, parent) {
@@ -152,31 +162,27 @@ export default function (code, { dir, base }) {
             const result = isTargetElement(selectorNode, node, linker);
 
             if (result) {
-              const [append, start, end] = getInjectionSlot(node);
-              if (append) {
-                const classList = postponed.get(end);
-                const newClassList = replaceList.get(selectorNode);
-                if (!classList) {
-                  postponed.set(end, newClassList);
-                } else {
-                  postponed.set(end, Object.assign(classList, newClassList));
-                }
+              const classList = overwriteCache.get(node);
+              const newClassList = replaceList.get(selectorNode);
+              if (!classList) {
+                overwriteCache.set(node, newClassList);
               } else {
-                //  TODO: Fix double overwrite
-                const minified = getMinifiedToken(
-                  replaceList.get(selectorNode)
-                );
-                changeable.overwrite(start, end, minified);
+                overwriteCache.set(node, Object.assign(classList, newClassList));
               }
             }
           }
         },
       });
 
-      //  Only write className once only
-      for (const [end, classList] of postponed) {
-        const minified = getMinifiedToken(classList)
-        changeable.appendRight(end, ` class="${minified}"`);
+      for (const [node, classList] of overwriteCache) {
+        const minified = getMinifiedToken(classList);
+        const [append, start, end] = getInjectionSlot(node);
+
+        if (append) {
+          changeable.appendRight(end, ` class="${minified}"`);
+        } else {
+          changeable.overwrite(start, end, minified);
+        }
       }
 
       return this;
