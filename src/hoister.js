@@ -1,8 +1,8 @@
 import { getProxiedObject } from "./helper.js";
 
-const foundInLayout = (layoutClassList, className) => {
-  for (const original in layoutClassList) {
-    for (const minified in layoutClassList[original]) {
+const foundInLayout = (layoutDeclCache, className) => {
+  for (const [, tokenList] of layoutDeclCache) {
+    for (const minified in tokenList) {
       if (minified === className) {
         return true;
       }
@@ -63,8 +63,8 @@ export const hoistDeclaration = (
 
   const list = [];
 
-  for (const original in currentComponentDecl) {
-    for (const minified in currentComponentDecl[original]) {
+  for (const [, tokenList] of currentComponentDecl) {
+    for (const minified in tokenList) {
       if (!foundInLayout(layoutDecl, minified)) {
         list.push(minified);
       }
@@ -78,10 +78,18 @@ const filterDeclaration = (list, declarationCache) => {
   const result = getProxiedObject();
 
   for (const mediaQuery in declarationCache) {
-    for (const originalDecl in declarationCache[mediaQuery]) {
-      const token = declarationCache[mediaQuery][originalDecl];
-      if (list.includes(token)) {
-        result[mediaQuery][originalDecl] = token;
+    if (!result[mediaQuery]) {
+      result[mediaQuery] = {};
+    }
+    for (const pseudo in declarationCache[mediaQuery]) {
+      if (!result[mediaQuery][pseudo]) {
+        result[mediaQuery][pseudo] = {};
+      }
+      for (const original in declarationCache[mediaQuery][pseudo]) {
+        const token = declarationCache[mediaQuery][pseudo][original];
+        if (list.includes(token)) {
+          result[mediaQuery][pseudo][original] = token;
+        }
       }
     }
   }

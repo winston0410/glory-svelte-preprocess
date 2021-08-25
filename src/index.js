@@ -37,7 +37,7 @@ export default function (opts = {}) {
 
         const result = transformer
           .transformHtml(ast.html, classCache)
-          .transformCss(ast.css, declarationCache)
+          .transformCss(ast.css, hoisted)
           .toString();
 
         return {
