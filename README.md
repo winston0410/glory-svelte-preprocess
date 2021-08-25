@@ -122,9 +122,11 @@ This preprocess will transform rules with the following selectors:
 
 ## Known limitations
 
-This preprocess currently doesn't handle the following selectors:
+This preprocess currently doesn't handle the following selectors. It will not transform rules with theses selectors.
 
 - multiple pseudo selectors (e.g. `.foo:active .bar:hover`)
+
+- `:global()` selector (as `svelte/compiler` doesn't parse its value correctly right now)
 
 ## FAQ
 
