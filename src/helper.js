@@ -40,31 +40,31 @@ export const getMediaQuery = (rule) => {
   return name;
 };
 
-export const getSelectorNode = (rule) => rule.prelude.children[0];
-
 export const getClassName = (rule) => {
   //  This preprocess doesn't handle selectors with multiple pseudo selectors right now
-  let pseudoCount = 0;
-  for (const selectorNode of getSelectorNode(rule).children) {
-    if (pseudoCount > 1) {
-      return false;
-    }
-    switch (selectorNode.type) {
-      case "PseudoElementSelector":
-        pseudoCount++;
-        break;
-      case "PseudoClassSelector":
-        //  Ignore global as the value in compiler is not correct right now
-        if (selectorNode.name === "global") {
-          return false;
-        }
-        if (selectorNode.name !== "not") {
+  for (const selectorNodeList of rule.prelude.children) {
+    let pseudoCount = 0;
+    for (const selectorNode of selectorNodeList.children) {
+      if (pseudoCount > 1) {
+        return false;
+      }
+      switch (selectorNode.type) {
+        case "PseudoElementSelector":
           pseudoCount++;
-        }
-        break;
+          break;
+        case "PseudoClassSelector":
+          //  Ignore global as the value in compiler is not correct right now
+          if (selectorNode.name === "global") {
+            return false;
+          }
+          if (selectorNode.name !== "not") {
+            pseudoCount++;
+          }
+          break;
 
-      default:
-        break;
+        default:
+          break;
+      }
     }
   }
   return true;

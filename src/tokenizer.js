@@ -5,7 +5,6 @@ import {
   getClassName,
   getDeclaration,
   getPseudoSelector,
-  getSelectorNode,
 } from "./helper.js";
 
 const tokenizeRules = (
@@ -18,14 +17,14 @@ const tokenizeRules = (
   let generatedClassList = {};
 
   if (!declarationCache[relatedAtRule]) {
-      declarationCache[relatedAtRule] = {}
+    declarationCache[relatedAtRule] = {};
   }
 
   if (!declarationCache[relatedAtRule][pseudo]) {
-      declarationCache[relatedAtRule][pseudo] = {}
+    declarationCache[relatedAtRule][pseudo] = {};
   }
 
-  const targetCache = declarationCache[relatedAtRule][pseudo]
+  const targetCache = declarationCache[relatedAtRule][pseudo];
 
   for (const declarationNode of rule.block.children) {
     const declaration = getDeclaration(declarationNode);
@@ -50,13 +49,14 @@ const hydrateClassCache = (
 ) => {
   const shouldMinify = getClassName(rule);
   if (shouldMinify) {
-    const selector = getSelectorNode(rule);
-    const pseudo = getPseudoSelector(selector);
+    for (const selector of rule.prelude.children) {
+      const pseudo = getPseudoSelector(selector);
 
-    tempCache.set(
-      selector,
-      tokenizeRules(rule, declarationCache, next, pseudo, mediaQueryName)
-    );
+      tempCache.set(
+        selector,
+        tokenizeRules(rule, declarationCache, next, pseudo, mediaQueryName)
+      );
+    }
   }
 };
 
