@@ -1,7 +1,3 @@
-<script>
-  console.log('check hello world')
-</script>
-
 <style>
     h1{
         font-size: 40px;
