@@ -1,7 +1,7 @@
 import wrappedPreprocessor from "./wrapper.js";
 import { reset } from "../src/index.js";
 
-describe("when given multiple rules for the same element", function () {
+describe("when an declaration is found in both layout and pages", function () {
   const code = `
 <style>
 .hello{
@@ -25,7 +25,7 @@ div {
   wrappedPreprocessor(layoutCode, layoutFilename).code;
   
   const result = wrappedPreprocessor(code, filename).code;
-  it("should hoist class to layout.svelte", function () {
+  it("should hoist that declaration to layout.svelte", function () {
     expect(result.replace(/\s/g, "")).toBe(
       `<style>
         :global(.b){
@@ -38,3 +38,11 @@ div {
     );
   });
 });
+
+describe('when a declaration is found in all pages', () => {
+    describe('when that declaration is not found in layout', () => {
+        it('should be hoisted to __layout.svelte', async () => {
+            
+        })
+    })
+})
