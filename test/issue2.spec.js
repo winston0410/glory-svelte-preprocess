@@ -272,7 +272,7 @@ describe("when given a rule with :not pseudo selector", function () {
         :global(.a){
           color: #ff3e00;
         }
-      </style><p class="a"></p><p class="a"></p>
+      </style><p class="a"></p><p class="world a"></p>
 `.replace(/\s/g, "")
     );
   });

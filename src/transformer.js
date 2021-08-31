@@ -5,11 +5,36 @@ import {
   getClassName,
   matchWithSelector,
   getMinifiedToken,
-  getInjectionSlot,
+  getAttribute,
   createGenerator,
   isCombinator,
 } from "./helper.js";
 import createLinker from "./linker.js";
+
+const getLastSelector = (node) => {
+  const lastSelector = node.children[node.children.length - 1]
+  switch (lastSelector.type) {
+      case "PseudoClassSelector":{
+        if (lastSelector.name === "not") {
+            return lastSelector
+        }
+        return node.children[node.children.length - 2]
+      }
+          
+      case 'PseudoElementSelector': {
+        return node.children[node.children.length - 2]
+      }
+  }
+  
+  return lastSelector
+}
+
+const getOriginalClassPos = (elem, targetClass) => {
+  const classAttr = getAttribute(elem, "class");
+  const className = classAttr.value[0]
+  const targetStart = classAttr.value[0].raw.indexOf(targetClass)
+  return [ className.start + targetStart, className.start + targetStart + targetClass.length]
+}
 
 const isTargetElement = (selectorNode, node, linker) => {
   let found = false;
@@ -138,7 +163,8 @@ export default function (code, { dir, base }) {
     transformHtml(ast, cache) {
       const replaceList = cache[dir][base];
       const linker = createLinker();
-      const overwriteCache = new Map();
+      //  Storing node with no class attribute, update them once only after the loop
+      const noClassCache = new Map();
 
       walk(ast, {
         enter(node, parent) {
@@ -152,27 +178,33 @@ export default function (code, { dir, base }) {
             const result = isTargetElement(selectorNode, node, linker);
 
             if (result) {
-              const classList = overwriteCache.get(node);
-              const newClassList = replaceList.get(selectorNode);
-              if (!classList) {
-                overwriteCache.set(node, newClassList);
-              } else {
-                overwriteCache.set(node, Object.assign(classList, newClassList));
-              }
+                const lastSelector = getLastSelector(selectorNode)
+                const minified = getMinifiedToken(replaceList.get(selectorNode))
+                
+                if (lastSelector.type === "ClassSelector") {
+                    const [start, end] = getOriginalClassPos(node, lastSelector.name)
+                    changeable.appendRight(end, minified)
+                    //  Can be reran safely??? Hacky
+                    changeable.overwrite(start, end, "")
+                    continue
+                } 
+                
+                const classAttr = getAttribute(node, "class")
+                if (classAttr) {
+                    const end = classAttr.value[0].end
+                    changeable.appendRight(end, minified)
+                } else {
+                    const end = node.start + node.name.length + 1;
+                    noClassCache.set(end, Object.assign(noClassCache.get(end) ?? {}, replaceList.get(selectorNode)))
+                }
             }
           }
         },
       });
 
-      for (const [node, classList] of overwriteCache) {
-        const minified = getMinifiedToken(classList);
-        const [append, start, end] = getInjectionSlot(node);
-
-        if (append) {
-          changeable.appendRight(end, ` class="${minified}"`);
-        } else {
-          changeable.overwrite(start, end, minified);
-        }
+      for (const [end, classList] of noClassCache) {
+          const minified = getMinifiedToken(classList)
+          changeable.appendRight(end, ` class="${minified}"`)
       }
 
       return this;

@@ -1,22 +1,6 @@
 export const getAttribute = (elem, name) =>
   elem.attributes?.find((attr) => attr.name === name);
 
-export const getInjectionSlot = (elem) => {
-  let append = false;
-  let start, end;
-  const classAttr = getAttribute(elem, "class");
-  if (classAttr) {
-    const classAttrValue = classAttr.value[0];
-    start = classAttrValue.start;
-    end = classAttrValue.end;
-  } else {
-    append = true;
-    end = elem.start + elem.name.length + 1;
-  }
-
-  return [append, start, end];
-};
-
 export const getMediaQuery = (rule) => {
   let name = "@" + rule.name;
   for (const child of rule.prelude.children[0].children[0].children) {

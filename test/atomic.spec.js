@@ -32,7 +32,7 @@ div {
           font-size: 20px;
         }
       </style>
-      <div class="a b unrelated">
+      <div class="b unrelated a">
       </div>
 `.replace(/\s/g, "")
     );
