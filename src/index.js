@@ -15,7 +15,7 @@ const defaultOpts = {
 };
 
 export default function (opts = {}) {
-  Object.assign(opts, defaultOpts);
+  opts = {...defaultOpts, ...opts}
   return {
     markup: function ({ content, filename }) {
       //  Ignore all default code
