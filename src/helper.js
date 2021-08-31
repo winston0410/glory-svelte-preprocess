@@ -91,8 +91,12 @@ export const getDeclaration = (declarationNode) => {
     return "";
   }
   let declaration = `${declarationNode.property}:`;
-  for (const valueNode of declarationNode.value.children) {
-    declaration += stringifyDeclarationNode(valueNode);
+  if (declarationNode.value.type === "Raw") {
+    declaration += declarationNode.value.value
+  } else {
+    for (const valueNode of declarationNode.value.children) {
+      declaration += stringifyDeclarationNode(valueNode);
+    }
   }
   return `${declaration};`;
 };
