@@ -49,6 +49,7 @@ div {
   });
 });
 
+
 describe("when an declaration is found in both layout and pages", function () {
   const code = `
 <style>

@@ -6,7 +6,7 @@ afterEach(() => {
 })
 
 describe("when given multiple rules for the same element", function () {
-  it("should add classes to the tag", function () {
+  it("should add all classes to the tag", function () {
     const code = `
 <style>
 div {
