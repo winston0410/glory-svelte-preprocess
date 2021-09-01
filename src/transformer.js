@@ -141,8 +141,10 @@ export default function (code, { dir, base }) {
   return {
     transformCss(ast, cache) {
       const rules = assembleRules(cache);
-      if (!ast && Object.keys(cache).length > 0) {
-        changeable.appendRight(0, `<style>${rules}</style>`);
+      if (!ast) {
+        if (Object.keys(cache).length > 0) {
+            changeable.appendRight(0, `<style>${rules}</style>`);
+        }
         return this;
       }
       walk(ast, {
@@ -177,7 +179,8 @@ export default function (code, { dir, base }) {
       });
       
       //  Write once only
-      changeable.appendRight(ast.children[0].start, rules);
+      //  Append on ending tag as it won't change whatsoever
+      changeable.appendRight(ast.end - "</style>".length, rules);
       return this;
     },
     transformHtml(ast, cache) {
