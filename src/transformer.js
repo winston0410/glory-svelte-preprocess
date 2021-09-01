@@ -41,7 +41,7 @@ const getOriginalClassPos = (elem, targetClass) => {
         valueNode.expression.quasis[0].start + start + targetClass.length,
       ];
     } else if (valueNode.expression.type === "Literal") {
-      const start = valueNode.expression.raw.indexOf(targetClass)
+      const start = valueNode.expression.raw.indexOf(targetClass);
       return [
         valueNode.expression.start + start,
         valueNode.expression.start + start + targetClass.length,
@@ -140,7 +140,7 @@ export default function (code, { dir, base }) {
 
   return {
     transformCss(ast, cache) {
-      const rules = assembleRules(cache)
+      const rules = assembleRules(cache);
       if (!ast && Object.keys(cache).length > 0) {
         changeable.appendRight(0, `<style>${rules}</style>`);
         return this;
@@ -149,18 +149,13 @@ export default function (code, { dir, base }) {
         enter(node) {
           switch (node.type) {
             case "Style": {
+              //  Remove class that can be minified
               for (const child of node.children) {
                 if (child.type === "Rule") {
                   if (getClassName(child)) {
                     changeable.overwrite(child.start, child.end, "");
                   }
                 }
-              }
-              if (node.children.length > 0) {
-                changeable.appendRight(
-                  node.children[0].start,
-                  rules
-                );
               }
               return;
             }
@@ -169,7 +164,9 @@ export default function (code, { dir, base }) {
               if (node.name !== "media") {
                 return;
               }
-              return changeable.overwrite(node.start, node.end, rules);
+              //  Remove all media queries
+              //  TODO: should only remove minified media queries
+              return changeable.overwrite(node.start, node.end, "");
             }
 
             default: {
@@ -178,6 +175,9 @@ export default function (code, { dir, base }) {
           }
         },
       });
+      
+      //  Write once only
+      changeable.appendRight(ast.children[0].start, rules);
       return this;
     },
     transformHtml(ast, cache) {
