@@ -31,9 +31,13 @@ const getLastSelector = (node) => {
 
 const getOriginalClassPos = (elem, targetClass) => {
   const classAttr = getAttribute(elem, "class");
-  const className = classAttr.value[0]
-  const targetStart = classAttr.value[0].raw.indexOf(targetClass)
-  return [ className.start + targetStart, className.start + targetStart + targetClass.length]
+  const valueNode = classAttr.value[0]
+  if (valueNode.type === "MustacheTag") {
+      const start = valueNode.expression.quasis[0].value.raw.indexOf(targetClass)
+      return [ valueNode.expression.quasis[0].start + start, valueNode.expression.quasis[0].start + start + targetClass.length]
+  } 
+  const targetStart = valueNode.raw.indexOf(targetClass)
+  return [ valueNode.start + targetStart, valueNode.start + targetStart + targetClass.length]
 }
 
 const isTargetElement = (selectorNode, node, linker) => {

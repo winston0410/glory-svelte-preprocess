@@ -172,11 +172,23 @@ export const matchWithSelector = (element, selector) => {
       if (!attr) {
         return false;
       }
-      for (const className of attr.value[0].raw.split(" ")) {
-        if (className === selector.name) {
-          return true;
+            
+      for (const node of attr.value) {
+        if (node.type === "MustacheTag") {
+            for (const className of node.expression.quasis) {
+                if (className.value.cooked === selector.name) {
+                    return true
+                }
+            }
+        } else if(node.type === "Text"){
+          for (const className of node.raw.split(" ")) {
+            if (className === selector.name) {
+              return true;
+            }
+          }
         }
       }
+      
       return false;
     }
     case "AttributeSelector": {
