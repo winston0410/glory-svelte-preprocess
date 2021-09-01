@@ -140,8 +140,9 @@ export default function (code, { dir, base }) {
 
   return {
     transformCss(ast, cache) {
+      const rules = assembleRules(cache)
       if (!ast && Object.keys(cache).length > 0) {
-        changeable.appendRight(0, `<style>${assembleRules(cache)}</style>`);
+        changeable.appendRight(0, `<style>${rules}</style>`);
         return this;
       }
       walk(ast, {
@@ -158,7 +159,7 @@ export default function (code, { dir, base }) {
               if (node.children.length > 0) {
                 changeable.appendRight(
                   node.children[0].start,
-                  assembleRules(cache)
+                  rules
                 );
               }
               return;
@@ -168,7 +169,7 @@ export default function (code, { dir, base }) {
               if (node.name !== "media") {
                 return;
               }
-              return changeable.overwrite(node.start, node.end, "");
+              return changeable.overwrite(node.start, node.end, rules);
             }
 
             default: {
