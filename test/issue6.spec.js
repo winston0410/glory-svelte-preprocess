@@ -1,7 +1,3 @@
-import createTokenizer from "../src/tokenizer";
-import { getProxiedObject } from "../src/helper";
-import { parse } from "svelte/compiler";
-import path from "path";
 import wrappedPreprocessor from "./wrapper.js";
 import { reset } from "../src/index.js";
 
