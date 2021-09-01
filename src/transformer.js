@@ -12,33 +12,48 @@ import {
 import createLinker from "./linker.js";
 
 const getLastSelector = (node) => {
-  const lastSelector = node.children[node.children.length - 1]
+  const lastSelector = node.children[node.children.length - 1];
   switch (lastSelector.type) {
-      case "PseudoClassSelector":{
-        if (lastSelector.name === "not") {
-            return lastSelector
-        }
-        return node.children[node.children.length - 2]
+    case "PseudoClassSelector": {
+      if (lastSelector.name === "not") {
+        return lastSelector;
       }
-          
-      case 'PseudoElementSelector': {
-        return node.children[node.children.length - 2]
-      }
+      return node.children[node.children.length - 2];
+    }
+
+    case "PseudoElementSelector": {
+      return node.children[node.children.length - 2];
+    }
   }
-  
-  return lastSelector
-}
+
+  return lastSelector;
+};
 
 const getOriginalClassPos = (elem, targetClass) => {
   const classAttr = getAttribute(elem, "class");
-  const valueNode = classAttr.value[0]
+  const valueNode = classAttr.value[0];
   if (valueNode.type === "MustacheTag") {
-      const start = valueNode.expression.quasis[0].value.raw.indexOf(targetClass)
-      return [ valueNode.expression.quasis[0].start + start, valueNode.expression.quasis[0].start + start + targetClass.length]
-  } 
-  const targetStart = valueNode.raw.indexOf(targetClass)
-  return [ valueNode.start + targetStart, valueNode.start + targetStart + targetClass.length]
-}
+    if (valueNode.expression.type === "TemplateLiteral") {
+      const start =
+        valueNode.expression.quasis[0].value.raw.indexOf(targetClass);
+      return [
+        valueNode.expression.quasis[0].start + start,
+        valueNode.expression.quasis[0].start + start + targetClass.length,
+      ];
+    } else if (valueNode.expression.type === "Literal") {
+      const start = valueNode.expression.raw.indexOf(targetClass)
+      return [
+        valueNode.expression.start + start,
+        valueNode.expression.start + start + targetClass.length,
+      ];
+    }
+  }
+  const targetStart = valueNode.raw.indexOf(targetClass);
+  return [
+    valueNode.start + targetStart,
+    valueNode.start + targetStart + targetClass.length,
+  ];
+};
 
 const isTargetElement = (selectorNode, node, linker) => {
   let found = false;
@@ -182,33 +197,42 @@ export default function (code, { dir, base }) {
             const result = isTargetElement(selectorNode, node, linker);
 
             if (result) {
-                const lastSelector = getLastSelector(selectorNode)
-                const minified = getMinifiedToken(replaceList.get(selectorNode))
-                
-                if (lastSelector.type === "ClassSelector") {
-                    const [start, end] = getOriginalClassPos(node, lastSelector.name)
-                    changeable.appendRight(end, minified)
-                    //  Can be reran safely??? Hacky
-                    changeable.overwrite(start, end, "")
-                    continue
-                } 
-                
-                const classAttr = getAttribute(node, "class")
-                if (classAttr) {
-                    const end = classAttr.value[0].end
-                    changeable.appendRight(end, minified)
-                } else {
-                    const end = node.start + node.name.length + 1;
-                    noClassCache.set(end, Object.assign(noClassCache.get(end) ?? {}, replaceList.get(selectorNode)))
-                }
+              const lastSelector = getLastSelector(selectorNode);
+              const minified = getMinifiedToken(replaceList.get(selectorNode));
+
+              if (lastSelector.type === "ClassSelector") {
+                const [start, end] = getOriginalClassPos(
+                  node,
+                  lastSelector.name
+                );
+                changeable.appendRight(end, minified);
+                //  Can be reran safely??? Hacky
+                changeable.overwrite(start, end, "");
+                continue;
+              }
+
+              const classAttr = getAttribute(node, "class");
+              if (classAttr) {
+                const end = classAttr.value[0].end;
+                changeable.appendRight(end, minified);
+              } else {
+                const end = node.start + node.name.length + 1;
+                noClassCache.set(
+                  end,
+                  Object.assign(
+                    noClassCache.get(end) ?? {},
+                    replaceList.get(selectorNode)
+                  )
+                );
+              }
             }
           }
         },
       });
 
       for (const [end, classList] of noClassCache) {
-          const minified = getMinifiedToken(classList)
-          changeable.appendRight(end, ` class="${minified}"`)
+        const minified = getMinifiedToken(classList);
+        changeable.appendRight(end, ` class="${minified}"`);
       }
 
       return this;

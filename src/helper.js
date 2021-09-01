@@ -175,9 +175,17 @@ export const matchWithSelector = (element, selector) => {
             
       for (const node of attr.value) {
         if (node.type === "MustacheTag") {
-            for (const className of node.expression.quasis) {
-                if (className.value.cooked === selector.name) {
-                    return true
+            if (node.expression.type === "TemplateLiteral") {
+                for (const className of node.expression.quasis) {
+                    if (className.value.cooked === selector.name) {
+                        return true
+                    }
+                }
+            } else if(node.expression.type === "Literal"){
+                for (const className of node.expression.value.split(" ")) {
+                    if (className === selector.name) {
+                        return true
+                    }
                 }
             }
         } else if(node.type === "Text"){
