@@ -59,6 +59,24 @@ color: #ff3e00;
   });
 });
 
+describe("when given multiple rules with id selector", function () {
+  const code = `
+<style>
+#hello{
+font-size: 20px;
+color: #ff3e00;
+}
+</style><h1 id="hello"></h1>`;
+
+  const filename = "/src/routes/index.svelte";
+  it("should add class to the right HTML tag", function () {
+    const result = wrappedPreprocessor(code, filename).code;
+    const { html } = splitCode(result);
+
+    expect(html).toBe(`<h1 class="a b" id="hello"></h1>`);
+  });
+});
+
 describe("when given a rule with type selector", function () {
   const code = `
 <style>
@@ -73,6 +91,24 @@ color: #ff3e00;
     const { html } = splitCode(result);
 
     expect(html).toBe(`<h1 class="a"></h1>`);
+  });
+});
+
+describe("when given rules with type selector", function () {
+  const code = `
+<style>
+h1{
+color: #ff3e00;
+font-weight: 700;
+}
+</style><h1></h1>`;
+
+  const filename = "/src/routes/index.svelte";
+  it("should add class to the right HTML tag", function () {
+    const result = wrappedPreprocessor(code, filename).code;
+    const { html } = splitCode(result);
+
+    expect(html).toBe(`<h1 class="a b"></h1>`);
   });
 });
 
