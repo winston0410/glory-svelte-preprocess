@@ -209,7 +209,7 @@ export default function (code, { dir, base }) {
                   node,
                   lastSelector.name
                 );
-                changeable.appendRight(end, minified);
+                changeable.appendRight(end, ` ${minified}`);
                 //  Can be reran safely??? Hacky
                 changeable.overwrite(start, end, "");
                 continue;
@@ -218,7 +218,7 @@ export default function (code, { dir, base }) {
               const classAttr = getAttribute(node, "class");
               if (classAttr) {
                 const end = classAttr.value[0].end;
-                changeable.appendRight(end, minified);
+                changeable.appendRight(end, ` ${minified}`);
               } else {
                 const end = node.start + node.name.length + 1;
                 noClassCache.set(
