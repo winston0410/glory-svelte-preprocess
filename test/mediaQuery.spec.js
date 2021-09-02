@@ -6,8 +6,9 @@ afterEach(() => {
   reset();
 });
 
-describe("when given a rule with media query", function () {
-  const code = `
+describe("when given rules with media query", function () {
+  describe("when those queries only consist of min-width", () => {
+    const code = `
 <style>
 @media (min-width: 1200px){
     .hello{
@@ -24,11 +25,12 @@ describe("when given a rule with media query", function () {
 }
 </style>`;
 
-  const filename = "/src/routes/index.svelte";
-  it("should transform CSS rules in the order of media query", function () {
-    const result = wrappedPreprocessor(code, filename).code;
-    
-    expect(result.replace(/\s/g, "")).toBe(`<style>
+    const filename = "/src/routes/index.svelte";
+    it("should transform CSS rules from smallest to the biggest viewport", function () {
+      const result = wrappedPreprocessor(code, filename).code;
+
+      expect(result.replace(/\s/g, "")).toBe(
+        `<style>
     :global(.a){
         color: green;
     }
@@ -43,7 +45,101 @@ describe("when given a rule with media query", function () {
         color: blue;
         }
     }
-    </style>`.replace(/\s/g, ""))
+    </style>`.replace(/\s/g, "")
+      );
+    });
+  });
+});
+
+describe("when given rules with media query", function () {
+  describe("when those queries only consist of max-width", () => {
+    const code = `
+<style>
+@media (max-width: 1200px){
+    .hello{
+        color: blue;
+    }
+}
+.hello{
+    color: green;
+}
+@media (max-width: 768px){
+    .hello{
+    color: red;
+    }
+}
+</style>`;
+
+    const filename = "/src/routes/index.svelte";
+    it("should transform CSS rules from the biggest to the smallest viewport", function () {
+      const result = wrappedPreprocessor(code, filename).code;
+
+      expect(result.replace(/\s/g, "")).toBe(
+        `<style>
+    :global(.a){
+        color: green;
+    }
+        
+    @media (max-width: 1200px){
+        :global(.b){
+        color: blue;
+        }
+    }
+            
+    @media (max-width: 768px){
+        :global(.c){
+        color: red;
+        }
+    }
+    </style>`.replace(/\s/g, "")
+      );
+    });
+  });
+});
+
+describe("when given rules with media query", function () {
+  describe("when those queries consist of min-width and max-width", () => {
+    const code = `
+<style>
+@media (min-width: 800px){
+    .hello{
+        color: blue;
+    }
+}
+.hello{
+    color: green;
+}
+@media (max-width: 768px){
+    .hello{
+    color: red;
+    }
+}
+</style>`;
+
+    const filename = "/src/routes/index.svelte";
+    //  seems ok to be unsorted
+    it("should transform CSS rules from smallest to the biggest viewport", function () {
+      const result = wrappedPreprocessor(code, filename).code;
+
+      expect(result.replace(/\s/g, "")).toBe(
+        `<style>
+    :global(.a){
+        color: green;
+    }
+        
+    @media (max-width: 768px){
+        :global(.c){
+        color: red;
+        }
+    }
+    @media (min-width: 800px){
+        :global(.b){
+        color: blue;
+        }
+    }
+    </style>`.replace(/\s/g, "")
+      );
+    });
   });
 });
 

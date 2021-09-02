@@ -31,7 +31,6 @@ const compare = ([first], [second]) => {
         return 1
     }
     
-    //  Get context here
     //  TODO: Handle unit
     const { lowerLimit: firstLower, upperLimit: firstUpper, unit: firstUnit } = parseMediaQuery(first)
     const { lowerLimit: secondLower, upperLimit: secondUpper, unit: secondUnit } = parseMediaQuery(second)
@@ -39,8 +38,12 @@ const compare = ([first], [second]) => {
     if (firstUpper === -1 && secondUpper === -1) {
         return firstLower > secondLower ? 1 : -1
     }
+
+    if (firstLower === -1 && secondLower === -1) {
+        return firstUpper > secondUpper ? -1 : 1
+    }
     
-    return 1
+    return -1
 }
 
 export const sortCacheByKey = (cache) => {
