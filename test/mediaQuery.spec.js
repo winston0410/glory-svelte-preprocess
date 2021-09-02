@@ -7,6 +7,47 @@ afterEach(() => {
 });
 
 describe("when given a rule with media query", function () {
+  const code = `
+<style>
+@media (min-width: 1200px){
+    .hello{
+        color: blue;
+    }
+}
+.hello{
+    color: green;
+}
+@media (min-width: 768px){
+    .hello{
+    color: red;
+    }
+}
+</style>`;
+
+  const filename = "/src/routes/index.svelte";
+  it("should transform CSS rules in the order of media query", function () {
+    const result = wrappedPreprocessor(code, filename).code;
+    
+    expect(result.replace(/\s/g, "")).toBe(`<style>
+    :global(.a){
+        color: green;
+    }
+        
+    @media (min-width: 768px){
+        :global(.c){
+        color: red;
+        }
+    }
+    @media (min-width: 1200px){
+        :global(.b){
+        color: blue;
+        }
+    }
+    </style>`.replace(/\s/g, ""))
+  });
+});
+
+describe("when given a rule with media query", function () {
   it("should add class to the right HTML tag", function () {
     const code = `
 <style>

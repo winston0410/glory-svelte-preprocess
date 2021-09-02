@@ -3,6 +3,7 @@ import createTokenizer from "./tokenizer.js";
 import createTransformer from "./transformer.js";
 import { getProxiedObject } from "./helper.js";
 import { hoistDeclaration } from "./hoister.js";
+import { sortCacheByKey } from "./sorter.js";
 import path from "path";
 
 //  Keep state outside default function as it will be called multiple times
@@ -33,9 +34,11 @@ export default function (opts = {}) {
           declarationCache
         );
 
+        const sorted = sortCacheByKey(hoisted)
+
         const result = transformer
           .transformHtml(ast.html, classCache)
-          .transformCss(ast.css, hoisted)
+          .transformCss(ast.css, sorted)
           .toString();
 
         return {
