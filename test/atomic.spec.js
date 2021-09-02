@@ -1,9 +1,10 @@
 import wrappedPreprocessor from "./wrapper.js";
-import { reset } from "../src/index.js"
+import { reset } from "../src/index.js";
+import { splitCode } from "./helper.js";
 
 afterEach(() => {
-    reset()
-})
+  reset();
+});
 
 describe("when transforming HTML", function () {
   it("should only overwrite minified class", function () {
@@ -22,19 +23,8 @@ div {
 
     const result = wrappedPreprocessor(code, filename).code;
 
-    expect(result.replace(/\s/g, "")).toBe(
-      `<style>
-        :global(.a){
-          color: red;
-        }
-          
-        :global(.b){
-          font-size: 20px;
-        }
-      </style>
-      <div class="b unrelated a">
-      </div>
-`.replace(/\s/g, "")
-    );
+    const { html } = splitCode(result);
+
+    expect(html).toBe(`<div class=" b unrelated a"></div>`);
   });
 });

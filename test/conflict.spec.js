@@ -1,4 +1,5 @@
 import wrappedPreprocessor from "./wrapper.js";
+import { splitCode } from "./helper.js";
 import { reset } from "../src/index.js"
 
 afterEach(() => {
@@ -22,19 +23,10 @@ div {
 
     const result = wrappedPreprocessor(code, filename).code;
 
-    expect(result.replace(/\s/g, "")).toBe(
-      `<style>
-        :global(.a){
-          color: red;
-        }
-          
-        :global(.b){
-          font-size: 20px;
-        }
-      </style>
-      <div class="a b">
-      </div>
-`.replace(/\s/g, "")
+    const { html } = splitCode(result)
+
+    expect(html).toBe(
+      `<div class=" a b"></div>`
     );
   });
 });
